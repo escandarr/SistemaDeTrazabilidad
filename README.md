@@ -19,8 +19,8 @@ Grupo LC opera con pedidos por WhatsApp/papel, pesaje manual de tinetas y sin vi
 | Base de datos | PostgreSQL 16 |
 | Migraciones | Alembic (async) |
 | Autenticación | JWT + bcrypt |
-| Infraestructura | AWS |
-| Integración ERP | CSV/XML → Avesoft |
+| Infraestructura | Microsoft Azure (contenedores, TLS 1.3) |
+| Integración ERP | Archivos CSV batch asíncrono ↔ Avesoft (sin API) |
 
 ---
 
@@ -70,8 +70,9 @@ SistemaDeTrazabilidad/
 │   ├── app/
 │   │   ├── api/v1/          # Routers: auth, solicitudes, picking, despacho, devoluciones, stock
 │   │   ├── core/            # config.py, database.py, security.py
-│   │   ├── models/          # SQLAlchemy ORM
+│   │   ├── models/          # SQLAlchemy ORM (usuario, catalogo, operaciones)
 │   │   ├── schemas/         # Pydantic v2
+│   │   ├── services/        # Lógica de negocio: cubicación + pesaje
 │   │   ├── crud/
 │   │   └── main.py          # FastAPI app + CORS + /health
 │   ├── alembic/             # Migraciones de base de datos
@@ -91,6 +92,44 @@ SistemaDeTrazabilidad/
 ```
 
 ---
+
+## Modelo de datos
+
+Entidades principales (ver [backend/app/models/](backend/app/models/)):
+
+- **Maestros** ([catalogo.py](backend/app/models/catalogo.py)): `proveedores`, `productos`, `recetas`, `receta_detalle`, `centros_costo`
+- **Operaciones** ([operaciones.py](backend/app/models/operaciones.py)): `solicitudes`, `pickings`, `picking_items`, `despachos`, `devoluciones`, `devolucion_items`
+- **Acceso** ([usuario.py](backend/app/models/usuario.py)): `usuarios`
+
+### Máquina de estados de una solicitud
+
+```text
+Borrador → Enviada → En Picking → Despachada → Cerrada
+```
+
+### Lógica de negocio clave
+
+Implementada en [backend/app/services/](backend/app/services/):
+
+| Cálculo | Fórmula | Archivo |
+| --- | --- | --- |
+| Cubicación de materiales | `cantidad = cantidad_por_m2 × m² × (1 + holgura/100)` | [cubicacion.py](backend/app/services/cubicacion.py) |
+| Peso neto (descuento de tara) | `M_neto = M_bruto − M_tara(proveedor)` | [pesaje.py](backend/app/services/pesaje.py) |
+| Consumo real de obra | `Consumo = Σ Despachado − Σ Devuelto` | [pesaje.py](backend/app/services/pesaje.py) |
+
+La tara se resuelve por producto (override) o, si es NULL, por proveedor (ej.: Renner −1 kg; otros −2,5 kg).
+
+## Integración con Avesoft
+
+Avesoft **no expone API** — la integración es por archivos CSV en modo batch asíncrono. Tres puntos de conexión:
+
+| Punto | Dirección | Disparador y acción |
+| --- | --- | --- |
+| P1 — Maestro de insumos | Avesoft → Plataforma | Cronjob nocturno: importa catálogo y stocks de referencia |
+| P2 — Salidas de bodega | Plataforma → Avesoft | Al cerrar picking: CSV de consumos → guía de despacho SII + cargo a centro de costo |
+| P3 — Retornos y mermas | Plataforma → Avesoft | Al cierre de obra: CSV de reingreso → guía de ingreso por devolución |
+
+> Contacto técnico de integración: **Alfredo** (uno de los creadores de Avesoft). Próxima reunión de definición del picking: jueves 30/05/2026, 10:00.
 
 ## Levantar en desarrollo
 
@@ -189,7 +228,9 @@ alembic downgrade -1
 - [x] Flujo BPMN
 - [x] EDT + Gantt
 - [x] Setup inicial del repositorio
+- [x] Modelo de datos completo (10 entidades) + servicios de cubicación/pesaje
+- [x] Módulo core: autenticación (RF01) + solicitudes con cubicación (RF02)
 - [ ] Diagrama de red CPM (en proceso)
-- [ ] Desarrollo módulos core
-- [ ] Integración Avesoft
+- [ ] Módulos picking, despacho, devoluciones (RF03–RF05)
+- [ ] Integración Avesoft (CSV P1/P2/P3)
 - [ ] Pruebas y validación con usuarios

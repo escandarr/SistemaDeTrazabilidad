@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from jose import jwt
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
@@ -23,3 +23,12 @@ def create_access_token(subject: str) -> str:
         settings.secret_key,
         algorithm=settings.algorithm,
     )
+
+
+def decode_token(token: str) -> str | None:
+    """Devuelve el subject (email) del JWT, o None si es inválido/expirado."""
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    except JWTError:
+        return None
+    return payload.get("sub")

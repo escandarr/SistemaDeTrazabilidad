@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from app.core.config import settings
-from app.core.database import Base  # noqa: F401 — ensures models are imported
+from app.core.database import Base
+import app.models  # noqa: F401 — registra todas las entidades en Base.metadata
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)
