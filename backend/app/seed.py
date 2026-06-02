@@ -51,7 +51,8 @@ async def seed() -> None:
         renner = Proveedor(nombre="Renner", peso_tara_kg=1.0)
         otro = Proveedor(nombre="Proveedor B", peso_tara_kg=2.5)
 
-        # Productos — el 304 es sustituto técnico del 526 (RF07)
+        # --- Productos ---
+        # El 304 es sustituto técnico del 526 (RF07)
         prod_526 = Producto(
             codigo_avesoft="526",
             descripcion="Resina MMA base",
@@ -76,31 +77,98 @@ async def seed() -> None:
             stock_actual=40,
             stock_minimo=10,
         )
+        prod_epox = Producto(
+            codigo_avesoft="EPOX-A",
+            descripcion="Resina epóxica",
+            unidad_medida=UnidadMedida.KILO,
+            proveedor=renner,
+            stock_actual=245,
+            stock_minimo=100,
+        )
+        prod_cat = Producto(
+            codigo_avesoft="CAT-B",
+            descripcion="Catalizador B",
+            unidad_medida=UnidadMedida.KILO,
+            proveedor=otro,
+            stock_actual=87,
+            stock_minimo=50,
+        )
+        prod_dilu = Producto(
+            codigo_avesoft="DILU-C",
+            descripcion="Diluyente C",
+            unidad_medida=UnidadMedida.LITRO,
+            proveedor=renner,
+            stock_actual=23,
+            stock_minimo=40,  # bajo mínimo a propósito → alerta de stock
+        )
+        prod_pu = Producto(
+            codigo_avesoft="PU-R",
+            descripcion="Resina poliuretano",
+            unidad_medida=UnidadMedida.KILO,
+            proveedor=otro,
+            stock_actual=65,
+            stock_minimo=80,  # bajo mínimo a propósito → alerta de stock
+        )
+        prod_arido = Producto(
+            codigo_avesoft="ARIDO",
+            descripcion="Árido silíceo",
+            unidad_medida=UnidadMedida.KILO,
+            proveedor=otro,
+            stock_actual=540,
+            stock_minimo=200,
+        )
         prod_526.sustituto = prod_304
 
-        # Receta MMA con consumo por m²
+        # --- Recetas (sistemas de piso) ---
         receta_mma = Receta(
             nombre_sistema=SistemaPiso.MMA,
-            descripcion="Sistema MMA estándar (3 capas)",
+            descripcion="MMA estándar · secado rápido · 3 capas",
             activa=True,
             detalle=[
                 RecetaDetalle(producto=prod_526, cantidad_por_m2=1.5),
                 RecetaDetalle(producto=prod_pigmento, cantidad_por_m2=0.2),
             ],
         )
+        receta_epoxi = Receta(
+            nombre_sistema=SistemaPiso.EPOXI,
+            descripcion="Epóxico industrial · 2 capas · uso general",
+            activa=True,
+            detalle=[
+                RecetaDetalle(producto=prod_epox, cantidad_por_m2=0.35),
+                RecetaDetalle(producto=prod_cat, cantidad_por_m2=0.15),
+                RecetaDetalle(producto=prod_dilu, cantidad_por_m2=0.05),
+            ],
+        )
+        receta_uretano = Receta(
+            nombre_sistema=SistemaPiso.URETANO,
+            descripcion="Uretano antideslizante · con árido · zonas húmedas",
+            activa=True,
+            detalle=[
+                RecetaDetalle(producto=prod_pu, cantidad_por_m2=0.45),
+                RecetaDetalle(producto=prod_cat, cantidad_por_m2=0.18),
+                RecetaDetalle(producto=prod_arido, cantidad_por_m2=0.30),
+            ],
+        )
 
         centro = CentroCosto(
-            codigo="OBRA-001",
+            codigo="CC-001",
             nombre_obra="Jumbo La Reina",
             cliente_identificador="Cencosud",
         )
 
-        db.add_all([admin, renner, otro, prod_526, prod_304, prod_pigmento, receta_mma, centro])
+        db.add_all(
+            [
+                admin, renner, otro,
+                prod_526, prod_304, prod_pigmento, prod_epox, prod_cat,
+                prod_dilu, prod_pu, prod_arido,
+                receta_mma, receta_epoxi, receta_uretano, centro,
+            ]
+        )
         await db.commit()
 
         print("Seed completado.")
         print(f"  Login admin: {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
-        print(f"  Receta MMA id: {receta_mma.id}  |  Centro de costo: {centro.codigo}")
+        print(f"  Recetas: MMA={receta_mma.id}, Epoxi={receta_epoxi.id}, Uretano={receta_uretano.id}")
 
 
 if __name__ == "__main__":

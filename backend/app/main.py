@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, despacho, devoluciones, picking, solicitudes, stock
+from app.api.v1 import auth, despacho, devoluciones, picking, recetas, solicitudes, stock
 
 app = FastAPI(title="Sistema de Trazabilidad Grupo LC", version="0.1.0")
 
@@ -13,7 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for router in [auth.router, solicitudes.router, picking.router, despacho.router, devoluciones.router, stock.router]:
+for router in [auth.router, recetas.router, solicitudes.router, picking.router, despacho.router, devoluciones.router, stock.router]:
     app.include_router(router, prefix="/api/v1")
 
 
