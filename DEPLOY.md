@@ -12,6 +12,27 @@ Arquitectura de producción (la correcta para este stack):
 
 ---
 
+## En producción (live)
+
+| Recurso | URL |
+| --- | --- |
+| Frontend (Vercel) | https://sistema-de-trazabilidad.vercel.app |
+| Backend (Railway) | https://sistemadetrazabilidad-production.up.railway.app |
+| Health check | https://sistemadetrazabilidad-production.up.railway.app/health |
+| API docs | https://sistemadetrazabilidad-production.up.railway.app/docs |
+
+- Login demo: `admin@grupolc.cl` / `admin1234`
+- Auto-deploy: cada push a `main` → Vercel redeploya solo. Railway también, salvo
+  que aparezca "GitHub Repo not found" (entonces reconectar el repo en Railway).
+- Variables clave en Railway: `DATABASE_URL` (ref. al Postgres), `SECRET_KEY`,
+  `CORS_ORIGINS = https://sistema-de-trazabilidad.vercel.app`.
+- Variable clave en Vercel: `VITE_API_URL = https://sistemadetrazabilidad-production.up.railway.app/api/v1`.
+
+> 💡 Railway corre con crédito de Trial (~US$5). Si se agota, los servicios se
+> suspenden; alternativa gratis evaluada: Render (backend) + Supabase (DB).
+
+---
+
 ## Parte A — Backend + PostgreSQL en Railway
 
 1. **railway.app** → *New Project* → *Deploy from GitHub repo* → elige `SistemaDeTrazabilidad`.
