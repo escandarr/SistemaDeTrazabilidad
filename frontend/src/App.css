@@ -161,10 +161,17 @@
 .badge--supervisor { background: var(--blue-100); color: var(--blue-700); }
 .badge--jefe_bodega { background: var(--amber-100); color: #92400e; }
 .badge--operario { background: var(--slate-200); color: var(--slate-700); }
+.badge--operario_bodega { background: var(--slate-200); color: var(--slate-700); }
+.badge--administrador { background: var(--blue-100); color: var(--blue-700); }
 
 .badge--pendiente { background: var(--amber-100); color: #92400e; }
 .badge--en_picking { background: var(--blue-100); color: var(--blue-700); }
 .badge--despachado { background: var(--green-100); color: var(--green-600); }
+
+.badge--borrador { background: var(--slate-200); color: var(--slate-700); }
+.badge--enviada { background: var(--amber-100); color: #92400e; }
+.badge--despachada { background: var(--green-100); color: var(--green-600); }
+.badge--cerrada { background: var(--green-100); color: var(--green-600); }
 
 .badge--ok { background: var(--green-100); color: var(--green-600); }
 .badge--low { background: var(--amber-100); color: #92400e; }

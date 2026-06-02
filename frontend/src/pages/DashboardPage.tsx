@@ -1,38 +1,35 @@
 import { Header } from '../components/Header'
-import { User, Solicitud, StockItem, Page } from '../mock'
-
-const ESTADO_LABELS: Record<string, string> = {
-  pendiente: 'Pendiente',
-  en_picking: 'En Picking',
-  despachado: 'Despachado',
-}
+import type { Page, Producto, Rol, Solicitud, User } from '../types'
+import { ESTADO_LABELS } from '../types'
 
 interface Module {
   id: string
   icon: string
   name: string
   desc: string
-  roles: string[]
+  roles: Rol[]
   navigable: boolean
 }
 
 const MODULES: Module[] = [
-  { id: 'nueva-solicitud', icon: '📋', name: 'Nueva Solicitud', desc: 'Crear pedido de materiales', roles: ['supervisor'], navigable: true },
-  { id: 'solicitudes', icon: '📦', name: 'Solicitudes', desc: 'Ver y gestionar pedidos', roles: ['supervisor', 'jefe_bodega'], navigable: true },
-  { id: 'picking', icon: '⚖️', name: 'Picking', desc: 'Alistar y pesar materiales', roles: ['jefe_bodega', 'operario'], navigable: false },
-  { id: 'despacho', icon: '🚚', name: 'Despacho', desc: 'Confirmar envío y generar guía', roles: ['jefe_bodega'], navigable: false },
-  { id: 'devoluciones', icon: '↩️', name: 'Devoluciones', desc: 'Registrar sobrantes con pesaje', roles: ['jefe_bodega', 'operario'], navigable: false },
-  { id: 'stock', icon: '📊', name: 'Inventario', desc: 'Stock actual y alertas', roles: ['supervisor', 'jefe_bodega'], navigable: true },
+  { id: 'nueva-solicitud', icon: '📋', name: 'Nueva Solicitud', desc: 'Crear pedido de materiales', roles: ['administrador', 'supervisor'], navigable: true },
+  { id: 'solicitudes', icon: '📦', name: 'Solicitudes', desc: 'Ver y gestionar pedidos', roles: ['administrador', 'supervisor', 'jefe_bodega'], navigable: true },
+  { id: 'picking', icon: '⚖️', name: 'Picking', desc: 'Alistar y pesar materiales', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], navigable: false },
+  { id: 'despacho', icon: '🚚', name: 'Despacho', desc: 'Confirmar envío y generar guía', roles: ['administrador', 'jefe_bodega'], navigable: false },
+  { id: 'devoluciones', icon: '↩️', name: 'Devoluciones', desc: 'Registrar sobrantes con pesaje', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], navigable: false },
+  { id: 'stock', icon: '📊', name: 'Inventario', desc: 'Stock actual y alertas', roles: ['administrador', 'supervisor', 'jefe_bodega'], navigable: true },
 ]
 
-function getStockAlerts(stock: StockItem[]) {
-  return stock.filter(s => s.cantidad < s.minimo)
+const PENDIENTES: Solicitud['estado'][] = ['borrador', 'enviada', 'en_picking']
+
+function getStockAlerts(stock: Producto[]) {
+  return stock.filter(s => s.stock_actual < s.stock_minimo)
 }
 
 interface Props {
   user: User
   solicitudes: Solicitud[]
-  stock: StockItem[]
+  stock: Producto[]
   navigate: (p: Page) => void
   logout: () => void
 }
@@ -41,7 +38,8 @@ export function DashboardPage({ user, solicitudes, stock, navigate, logout }: Pr
   const alerts = getStockAlerts(stock)
   const available = MODULES.filter(m => m.roles.includes(user.rol))
   const recent = solicitudes.slice(0, 3)
-  const pendientes = solicitudes.filter(s => s.estado === 'pendiente').length
+  const pendientes = solicitudes.filter(s => PENDIENTES.includes(s.estado)).length
+  const hoy = new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   function handleModule(m: Module) {
     if (!m.navigable) return
@@ -61,7 +59,7 @@ export function DashboardPage({ user, solicitudes, stock, navigate, logout }: Pr
 
         <div className="dashboard__header">
           <div className="dashboard__greeting">Hola, {user.nombre.split(' ')[0]}</div>
-          <div className="dashboard__date">Sábado 24 de mayo, 2026</div>
+          <div className="dashboard__date" style={{ textTransform: 'capitalize' }}>{hoy}</div>
         </div>
 
         <div className="dashboard__grid">
@@ -82,9 +80,7 @@ export function DashboardPage({ user, solicitudes, stock, navigate, logout }: Pr
               {m.id === 'solicitudes' && pendientes > 0 && (
                 <span className="badge badge--pendiente">{pendientes} pendiente{pendientes > 1 ? 's' : ''}</span>
               )}
-              {!m.navigable && (
-                <span className="badge badge--coming">Próximamente</span>
-              )}
+              {!m.navigable && <span className="badge badge--coming">Próximamente</span>}
             </div>
           ))}
         </div>
@@ -104,7 +100,7 @@ export function DashboardPage({ user, solicitudes, stock, navigate, logout }: Pr
             {recent.map(s => (
               <div key={s.id} className="solicitud-row">
                 <div>
-                  <div className="solicitud-row__id">{s.id} · {s.fecha}</div>
+                  <div className="solicitud-row__id">SOL-{String(s.id).padStart(3, '0')} · {s.creado_at.split('T')[0]}</div>
                   <div className="solicitud-row__obra">{s.obra}</div>
                   <div className="solicitud-row__meta">{s.sistema} · {s.m2} m²</div>
                 </div>

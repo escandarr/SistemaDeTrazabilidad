@@ -1,11 +1,6 @@
 import { Header } from '../components/Header'
-import { User, Solicitud, Page } from '../mock'
-
-const ESTADO_LABELS: Record<string, string> = {
-  pendiente: 'Pendiente',
-  en_picking: 'En Picking',
-  despachado: 'Despachado',
-}
+import type { Page, Solicitud, User } from '../types'
+import { ESTADO_LABELS } from '../types'
 
 interface Props {
   user: User
@@ -15,6 +10,8 @@ interface Props {
 }
 
 export function SolicitudesPage({ user, solicitudes, navigate, logout }: Props) {
+  const puedeCrear = user.rol === 'supervisor' || user.rol === 'administrador'
+
   return (
     <div className="app">
       <Header title="Solicitudes" user={user} onBack={() => navigate('dashboard')} onLogout={logout} />
@@ -22,7 +19,7 @@ export function SolicitudesPage({ user, solicitudes, navigate, logout }: Props) 
       <div className="page">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <h2 className="section-title" style={{ marginBottom: 0 }}>Todas las solicitudes</h2>
-          {user.rol === 'supervisor' && (
+          {puedeCrear && (
             <button
               className="btn btn--primary"
               style={{ padding: '8px 14px', fontSize: 13 }}
@@ -42,7 +39,7 @@ export function SolicitudesPage({ user, solicitudes, navigate, logout }: Props) 
           solicitudes.map(s => (
             <div key={s.id} className="solicitud-row">
               <div>
-                <div className="solicitud-row__id">{s.id} · {s.fecha}</div>
+                <div className="solicitud-row__id">SOL-{String(s.id).padStart(3, '0')} · {s.creado_at.split('T')[0]}</div>
                 <div className="solicitud-row__obra">{s.obra}</div>
                 <div className="solicitud-row__meta">{s.sistema} · {s.m2} m²</div>
               </div>

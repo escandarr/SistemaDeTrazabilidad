@@ -1,16 +1,31 @@
-import { User, USERS } from '../mock'
-
-const ROL_LABELS: Record<string, string> = {
-  supervisor: 'Supervisor',
-  jefe_bodega: 'Jefe de Bodega',
-  operario: 'Operario',
-}
+import { useState } from 'react'
+import type { FormEvent } from 'react'
+import { api } from '../services/api'
 
 interface Props {
-  onLogin: (u: User) => void
+  onLoggedIn: () => void | Promise<void>
 }
 
-export function LoginPage({ onLogin }: Props) {
+export function LoginPage({ onLoggedIn }: Props) {
+  const [email, setEmail] = useState('admin@grupolc.cl')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await api.login(email, password)
+      await onLoggedIn()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="login">
       <div className="login__brand">
@@ -19,20 +34,49 @@ export function LoginPage({ onLogin }: Props) {
         <p className="login__sub">Sistema de Trazabilidad — MVP</p>
       </div>
 
-      <div className="login__card">
-        <p className="login__label">Selecciona tu usuario</p>
-        <div className="login__users">
-          {USERS.map(u => (
-            <button key={u.id} className="login__user-btn" onClick={() => onLogin(u)}>
-              <div>
-                <div className="login__user-name">{u.nombre}</div>
-                <div className="login__user-role">{ROL_LABELS[u.rol]}</div>
-              </div>
-              <span className="login__arrow">→</span>
-            </button>
-          ))}
+      <form className="login__card" onSubmit={handleSubmit}>
+        <p className="login__label">Iniciar sesión</p>
+
+        <div className="form-group">
+          <label className="form-label">Email</label>
+          <input
+            className="form-input"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="tu@grupolc.cl"
+            autoComplete="username"
+            required
+          />
         </div>
-      </div>
+
+        <div className="form-group">
+          <label className="form-label">Contraseña</label>
+          <input
+            className="form-input"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+          />
+        </div>
+
+        {error && (
+          <div className="alert alert--warning" style={{ marginBottom: 12 }}>
+            {error}
+          </div>
+        )}
+
+        <button className="btn btn--primary btn--full btn--lg" type="submit" disabled={loading}>
+          {loading ? 'Ingresando…' : 'Ingresar →'}
+        </button>
+
+        <p style={{ marginTop: 14, fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>
+          Demo: admin@grupolc.cl / admin1234
+        </p>
+      </form>
     </div>
   )
 }

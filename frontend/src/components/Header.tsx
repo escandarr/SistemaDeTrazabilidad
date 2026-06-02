@@ -1,10 +1,5 @@
-import { User } from '../mock'
-
-const ROL_LABELS: Record<string, string> = {
-  supervisor: 'Supervisor',
-  jefe_bodega: 'Jefe de Bodega',
-  operario: 'Operario',
-}
+import type { User } from '../types'
+import { ROL_LABELS } from '../types'
 
 interface Props {
   title: string

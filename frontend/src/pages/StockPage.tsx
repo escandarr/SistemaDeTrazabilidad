@@ -1,9 +1,9 @@
 import { Header } from '../components/Header'
-import { User, StockItem, Page, MATERIALES } from '../mock'
+import type { Page, Producto, User } from '../types'
 
 interface Props {
   user: User
-  stock: StockItem[]
+  stock: Producto[]
   navigate: (p: Page) => void
   logout: () => void
 }
@@ -21,8 +21,8 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 export function StockPage({ user, stock, navigate, logout }: Props) {
-  const criticals = stock.filter(s => getStatus(s.cantidad, s.minimo) === 'critical')
-  const lows = stock.filter(s => getStatus(s.cantidad, s.minimo) === 'low')
+  const criticals = stock.filter(s => getStatus(s.stock_actual, s.stock_minimo) === 'critical')
+  const lows = stock.filter(s => getStatus(s.stock_actual, s.stock_minimo) === 'low')
 
   return (
     <div className="app">
@@ -56,19 +56,21 @@ export function StockPage({ user, stock, navigate, logout }: Props) {
             </thead>
             <tbody>
               {stock.map(s => {
-                const mat = MATERIALES.find(m => m.id === s.materialId)
-                const status = getStatus(s.cantidad, s.minimo)
-                const pct = Math.min(100, Math.round((s.cantidad / (s.minimo * 2)) * 100))
+                const status = getStatus(s.stock_actual, s.stock_minimo)
+                const pct = Math.min(100, Math.round((s.stock_actual / (s.stock_minimo * 2)) * 100))
                 return (
-                  <tr key={s.materialId}>
-                    <td style={{ fontWeight: 500 }}>{mat?.nombre ?? s.materialId}</td>
+                  <tr key={s.codigo_avesoft}>
+                    <td style={{ fontWeight: 500 }}>
+                      {s.descripcion}
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>{s.codigo_avesoft}</div>
+                    </td>
                     <td>
-                      <span className="td--num">{s.cantidad} kg</span>
+                      <span className="td--num">{s.stock_actual} {s.unidad_medida}</span>
                       <div className={`stock-bar stock-bar--${status}`}>
                         <div className="stock-bar__fill" style={{ width: `${pct}%` }} />
                       </div>
                     </td>
-                    <td className="td--num" style={{ color: '#64748b' }}>{s.minimo} kg</td>
+                    <td className="td--num" style={{ color: '#64748b' }}>{s.stock_minimo} {s.unidad_medida}</td>
                     <td>
                       <span className={`badge badge--${status}`}>{STATUS_LABELS[status]}</span>
                     </td>
