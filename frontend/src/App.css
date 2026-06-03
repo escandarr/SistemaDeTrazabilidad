@@ -223,18 +223,6 @@ tr:hover td { background: #fafbfc; }
 
 .login__brand { text-align: center; margin-bottom: 36px; }
 
-.login__logo {
-  width: 68px;
-  height: 68px;
-  background: var(--blue-600);
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  font-size: 32px;
-}
-
 .login__title { font-size: 26px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
 .login__sub { font-size: 14px; color: rgba(255,255,255,0.45); }
 
@@ -293,21 +281,25 @@ tr:hover td { background: #fafbfc; }
 .module-card {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 20px;
   cursor: pointer;
   transition: box-shadow 0.15s, transform 0.1s;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 8px;
-  border: 2px solid transparent;
+  min-height: 100px;
+  border-left: 3px solid var(--blue-600);
+  border-top: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-bottom: 2px solid transparent;
 }
-.module-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); border-color: var(--blue-100); }
+.module-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
 .module-card:active { transform: scale(0.98); }
-.module-card--inactive { opacity: 0.5; cursor: default; }
-.module-card--inactive:hover { box-shadow: var(--shadow-sm); transform: none; border-color: transparent; }
-.module-card__icon { font-size: 26px; line-height: 1; }
-.module-card__name { font-size: 14px; font-weight: 700; color: var(--slate-900); }
+.module-card--inactive { opacity: 0.5; cursor: default; border-left-color: var(--slate-200); }
+.module-card--inactive:hover { box-shadow: var(--shadow-sm); transform: none; }
+.module-card__name { font-size: 15px; font-weight: 700; color: var(--slate-900); }
 .module-card__desc { font-size: 12px; color: var(--slate-500); line-height: 1.4; }
 
 /* === SOLICITUDES LIST === */
@@ -425,7 +417,6 @@ tr:hover td { background: #fafbfc; }
 
 /* === SUCCESS === */
 .success-screen { text-align: center; padding: 48px 20px; }
-.success-screen__icon { font-size: 64px; margin-bottom: 16px; }
 .success-screen__title { font-size: 24px; font-weight: 700; color: var(--slate-900); margin-bottom: 8px; }
 .success-screen__sub { font-size: 15px; color: var(--slate-500); margin-bottom: 32px; }
 
