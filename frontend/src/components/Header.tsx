@@ -12,10 +12,8 @@ export function Header({ title, user, onBack, onLogout }: Props) {
   return (
     <header className="header">
       <div className="header__left">
-        {onBack ? (
+        {onBack && (
           <button className="header__back" onClick={onBack}>←</button>
-        ) : (
-          <span style={{ fontSize: 22 }}>🏭</span>
         )}
         <span className="header__title">{title}</span>
       </div>

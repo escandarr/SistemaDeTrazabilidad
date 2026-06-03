@@ -31,7 +31,7 @@ export function StockPage({ user, stock, navigate, logout }: Props) {
       <div className="page page--wide">
         {criticals.length > 0 && (
           <div className="alert alert--warning">
-            ⚠️ {criticals.length} material{criticals.length > 1 ? 'es' : ''} bajo stock mínimo —
+            {criticals.length} material{criticals.length > 1 ? 'es' : ''} bajo stock mínimo —
             solicitar reposición urgente a proveedor.
           </div>
         )}

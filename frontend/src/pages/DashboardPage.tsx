@@ -4,7 +4,6 @@ import { ESTADO_LABELS } from '../types'
 
 interface Module {
   id: string
-  icon: string
   name: string
   desc: string
   roles: Rol[]
@@ -12,12 +11,12 @@ interface Module {
 }
 
 const MODULES: Module[] = [
-  { id: 'nueva-solicitud', icon: '📋', name: 'Nueva Solicitud', desc: 'Crear pedido de materiales', roles: ['administrador', 'supervisor'], navigable: true },
-  { id: 'solicitudes', icon: '📦', name: 'Solicitudes', desc: 'Ver y gestionar pedidos', roles: ['administrador', 'supervisor', 'jefe_bodega'], navigable: true },
-  { id: 'picking', icon: '⚖️', name: 'Picking', desc: 'Alistar y pesar materiales', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], navigable: false },
-  { id: 'despacho', icon: '🚚', name: 'Despacho', desc: 'Confirmar envío y generar guía', roles: ['administrador', 'jefe_bodega'], navigable: false },
-  { id: 'devoluciones', icon: '↩️', name: 'Devoluciones', desc: 'Registrar sobrantes con pesaje', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], navigable: false },
-  { id: 'stock', icon: '📊', name: 'Inventario', desc: 'Stock actual y alertas', roles: ['administrador', 'supervisor', 'jefe_bodega'], navigable: true },
+  { id: 'nueva-solicitud', name: 'Nueva Solicitud', desc: 'Crear pedido de materiales', roles: ['administrador', 'supervisor'], navigable: true },
+  { id: 'solicitudes', name: 'Solicitudes', desc: 'Ver y gestionar pedidos', roles: ['administrador', 'supervisor', 'jefe_bodega'], navigable: true },
+  { id: 'picking', name: 'Picking', desc: 'Alistar y pesar materiales', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], navigable: false },
+  { id: 'despacho', name: 'Despacho', desc: 'Confirmar envío y generar guía', roles: ['administrador', 'jefe_bodega'], navigable: false },
+  { id: 'devoluciones', name: 'Devoluciones', desc: 'Registrar sobrantes con pesaje', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], navigable: false },
+  { id: 'stock', name: 'Inventario', desc: 'Stock actual y alertas', roles: ['administrador', 'supervisor', 'jefe_bodega'], navigable: true },
 ]
 
 const PENDIENTES: Solicitud['estado'][] = ['borrador', 'enviada', 'en_picking']
@@ -53,7 +52,7 @@ export function DashboardPage({ user, solicitudes, stock, navigate, logout }: Pr
       <div className="page">
         {alerts.length > 0 && (
           <div className="alert alert--warning" style={{ cursor: 'pointer' }} onClick={() => navigate('stock')}>
-            ⚠️ {alerts.length} material{alerts.length > 1 ? 'es' : ''} bajo stock mínimo — ver inventario →
+            {alerts.length} material{alerts.length > 1 ? 'es' : ''} bajo stock mínimo — ver inventario →
           </div>
         )}
 
@@ -69,7 +68,6 @@ export function DashboardPage({ user, solicitudes, stock, navigate, logout }: Pr
               className={`module-card ${!m.navigable ? 'module-card--inactive' : ''}`}
               onClick={() => handleModule(m)}
             >
-              <div className="module-card__icon">{m.icon}</div>
               <div>
                 <div className="module-card__name">{m.name}</div>
                 <div className="module-card__desc">{m.desc}</div>

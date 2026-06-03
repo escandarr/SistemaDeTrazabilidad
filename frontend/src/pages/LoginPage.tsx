@@ -29,7 +29,6 @@ export function LoginPage({ onLoggedIn }: Props) {
   return (
     <div className="login">
       <div className="login__brand">
-        <div className="login__logo">🏭</div>
         <h1 className="login__title">Grupo LC</h1>
         <p className="login__sub">Sistema de Trazabilidad — MVP</p>
       </div>

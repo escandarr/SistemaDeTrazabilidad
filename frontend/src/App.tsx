@@ -74,7 +74,6 @@ function App() {
     return (
       <div className="login">
         <div className="login__brand">
-          <div className="login__logo">🏭</div>
           <p className="login__sub">Cargando…</p>
         </div>
       </div>

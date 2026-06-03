@@ -95,7 +95,6 @@ export function NuevaSolicitudPage({ user, recetas, stock, onCreated, navigate, 
         <Header title="Nueva Solicitud" user={user} onBack={() => navigate('dashboard')} onLogout={logout} />
         <div className="page">
           <div className="success-screen">
-            <div className="success-screen__icon">✅</div>
             <h2 className="success-screen__title">Solicitud creada</h2>
             <p className="success-screen__sub">
               SOL-{String(solId).padStart(3, '0')} ha sido registrada y notificada a bodega.
@@ -231,7 +230,7 @@ export function NuevaSolicitudPage({ user, recetas, stock, onCreated, navigate, 
 
             {hayStockInsuficiente && (
               <div className="alert alert--warning">
-                ⚠️ Hay materiales con stock insuficiente. Verificar con bodega antes de confirmar.
+                Hay materiales con stock insuficiente. Verificar con bodega antes de confirmar.
               </div>
             )}
 
@@ -244,7 +243,7 @@ export function NuevaSolicitudPage({ user, recetas, stock, onCreated, navigate, 
                     <div>
                       <div className="resumen-item__name">{m.nombre}</div>
                       <div className="resumen-item__stock">
-                        Stock disponible: {m.stockActual} {m.unidad} {!ok ? '⚠️' : ''}
+                        Stock disponible: {m.stockActual} {m.unidad}
                       </div>
                     </div>
                     <div
@@ -261,7 +260,7 @@ export function NuevaSolicitudPage({ user, recetas, stock, onCreated, navigate, 
             <div className="nav-row">
               <button className="btn btn--secondary" onClick={() => setStep(1)} disabled={saving}>← Atrás</button>
               <button className="btn btn--primary" onClick={handleConfirm} disabled={saving}>
-                {saving ? 'Creando…' : 'Confirmar ✓'}
+                {saving ? 'Creando…' : 'Confirmar'}
               </button>
             </div>
           </>

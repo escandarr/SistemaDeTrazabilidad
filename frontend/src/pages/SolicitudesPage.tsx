@@ -32,7 +32,6 @@ export function SolicitudesPage({ user, solicitudes, navigate, logout }: Props) 
 
         {solicitudes.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: 48 }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
             <div style={{ color: '#64748b', fontSize: 15 }}>Sin solicitudes aún</div>
           </div>
         ) : (
