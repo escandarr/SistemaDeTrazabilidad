@@ -1,11 +1,7 @@
-import { Header } from '../components/Header'
-import type { Page, Producto, User } from '../types'
+import type { Producto } from '../types'
 
 interface Props {
-  user: User
   stock: Producto[]
-  navigate: (p: Page) => void
-  logout: () => void
 }
 
 function getStatus(actual: number, minimo: number): 'ok' | 'low' | 'critical' {
@@ -20,67 +16,63 @@ const STATUS_LABELS: Record<string, string> = {
   critical: 'Crítico',
 }
 
-export function StockPage({ user, stock, navigate, logout }: Props) {
+export function StockPage({ stock }: Props) {
   const criticals = stock.filter(s => getStatus(s.stock_actual, s.stock_minimo) === 'critical')
   const lows = stock.filter(s => getStatus(s.stock_actual, s.stock_minimo) === 'low')
 
   return (
-    <div className="app">
-      <Header title="Inventario" user={user} onBack={() => navigate('dashboard')} onLogout={logout} />
-
-      <div className="page page--wide">
-        {criticals.length > 0 && (
-          <div className="alert alert--warning">
-            {criticals.length} material{criticals.length > 1 ? 'es' : ''} bajo stock mínimo —
-            solicitar reposición urgente a proveedor.
-          </div>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 className="section-title" style={{ marginBottom: 0 }}>Stock actual</h2>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {criticals.length > 0 && <span className="badge badge--critical">{criticals.length} críticos</span>}
-            {lows.length > 0 && <span className="badge badge--low">{lows.length} bajo</span>}
-          </div>
+    <>
+      {criticals.length > 0 && (
+        <div className="alert alert--warning">
+          {criticals.length} material{criticals.length > 1 ? 'es' : ''} bajo stock mínimo —
+          solicitar reposición urgente a proveedor.
         </div>
+      )}
 
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Material</th>
-                <th>Stock actual</th>
-                <th>Mínimo</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stock.map(s => {
-                const status = getStatus(s.stock_actual, s.stock_minimo)
-                const pct = Math.min(100, Math.round((s.stock_actual / (s.stock_minimo * 2)) * 100))
-                return (
-                  <tr key={s.codigo_avesoft}>
-                    <td style={{ fontWeight: 500 }}>
-                      {s.descripcion}
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>{s.codigo_avesoft}</div>
-                    </td>
-                    <td>
-                      <span className="td--num">{s.stock_actual} {s.unidad_medida}</span>
-                      <div className={`stock-bar stock-bar--${status}`}>
-                        <div className="stock-bar__fill" style={{ width: `${pct}%` }} />
-                      </div>
-                    </td>
-                    <td className="td--num" style={{ color: '#64748b' }}>{s.stock_minimo} {s.unidad_medida}</td>
-                    <td>
-                      <span className={`badge badge--${status}`}>{STATUS_LABELS[status]}</span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+      <div className="content-head">
+        <h2 className="section-title" style={{ marginBottom: 0 }}>Stock actual</h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {criticals.length > 0 && <span className="badge badge--critical">{criticals.length} críticos</span>}
+          {lows.length > 0 && <span className="badge badge--low">{lows.length} bajo</span>}
         </div>
       </div>
-    </div>
+
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Stock actual</th>
+              <th>Mínimo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stock.map(s => {
+              const status = getStatus(s.stock_actual, s.stock_minimo)
+              const pct = Math.min(100, Math.round((s.stock_actual / (s.stock_minimo * 2)) * 100))
+              return (
+                <tr key={s.codigo_avesoft}>
+                  <td style={{ fontWeight: 500 }}>
+                    {s.descripcion}
+                    <div style={{ fontSize: 11, color: '#94a3b8' }}>{s.codigo_avesoft}</div>
+                  </td>
+                  <td>
+                    <span className="td--num">{s.stock_actual} {s.unidad_medida}</span>
+                    <div className={`stock-bar stock-bar--${status}`}>
+                      <div className="stock-bar__fill" style={{ width: `${pct}%` }} />
+                    </div>
+                  </td>
+                  <td className="td--num" style={{ color: '#64748b' }}>{s.stock_minimo} {s.unidad_medida}</td>
+                  <td>
+                    <span className={`badge badge--${status}`}>{STATUS_LABELS[status]}</span>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }

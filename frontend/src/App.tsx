@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import type { Page, Producto, Receta, Solicitud, User } from './types'
 import { api, getToken } from './services/api'
+import { Layout } from './components/Layout'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { NuevaSolicitudPage } from './pages/NuevaSolicitudPage'
 import { SolicitudesPage } from './pages/SolicitudesPage'
 import { StockPage } from './pages/StockPage'
+import { UsuariosPage } from './pages/UsuariosPage'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -27,7 +29,6 @@ function App() {
     setRecetas(recs)
   }
 
-  // Restaurar sesión si hay token guardado
   useEffect(() => {
     async function restore() {
       if (!getToken()) {
@@ -66,7 +67,7 @@ function App() {
     try {
       await loadData()
     } catch {
-      /* se ignora: el error ya se mostró en la acción que lo originó */
+      /* el error ya se mostró en la acción que lo originó */
     }
   }
 
@@ -84,16 +85,30 @@ function App() {
 
   const navigate = (p: Page) => setPage(p)
 
+  let content
   switch (page) {
     case 'dashboard':
-      return <DashboardPage user={user} solicitudes={solicitudes} stock={stock} navigate={navigate} logout={logout} />
+      content = <DashboardPage user={user} solicitudes={solicitudes} stock={stock} navigate={navigate} />
+      break
     case 'solicitudes':
-      return <SolicitudesPage user={user} solicitudes={solicitudes} navigate={navigate} logout={logout} />
+      content = <SolicitudesPage user={user} solicitudes={solicitudes} navigate={navigate} />
+      break
     case 'nueva-solicitud':
-      return <NuevaSolicitudPage user={user} recetas={recetas} stock={stock} onCreated={refresh} navigate={navigate} logout={logout} />
+      content = <NuevaSolicitudPage recetas={recetas} stock={stock} onCreated={refresh} navigate={navigate} />
+      break
     case 'stock':
-      return <StockPage user={user} stock={stock} navigate={navigate} logout={logout} />
+      content = <StockPage stock={stock} />
+      break
+    case 'usuarios':
+      content = <UsuariosPage currentUserId={user.id} />
+      break
   }
+
+  return (
+    <Layout user={user} page={page} navigate={navigate} logout={logout}>
+      {content}
+    </Layout>
+  )
 }
 
 export default App

@@ -22,6 +22,15 @@ class UsuarioRead(UsuarioBase):
     activo: bool
 
 
+class UsuarioUpdate(BaseModel):
+    """Edición por el administrador (rol, estado, datos). Todo opcional."""
+
+    nombre: str | None = None
+    rol: RolUsuario | None = None
+    activo: bool | None = None
+    password: str | None = None
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

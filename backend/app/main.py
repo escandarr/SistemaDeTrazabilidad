@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import app.models  # noqa: F401 — registra las entidades en Base.metadata
-from app.api.v1 import auth, despacho, devoluciones, picking, recetas, solicitudes, stock
+from app.api.v1 import auth, despacho, devoluciones, picking, recetas, solicitudes, stock, usuarios
 from app.core.config import settings
 from app.core.database import Base, engine
 
@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for router in [auth.router, recetas.router, solicitudes.router, picking.router, despacho.router, devoluciones.router, stock.router]:
+for router in [auth.router, usuarios.router, recetas.router, solicitudes.router, picking.router, despacho.router, devoluciones.router, stock.router]:
     app.include_router(router, prefix="/api/v1")
 
 

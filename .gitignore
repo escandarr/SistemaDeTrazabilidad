@@ -29,3 +29,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# residuo instalador de skills (caveman)
+skills-lock.json
+.agents/

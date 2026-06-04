@@ -4,13 +4,14 @@ export type Rol = 'administrador' | 'supervisor' | 'operario_bodega' | 'jefe_bod
 
 export type EstadoSolicitud = 'borrador' | 'enviada' | 'en_picking' | 'despachada' | 'cerrada'
 
-export type Page = 'dashboard' | 'solicitudes' | 'nueva-solicitud' | 'stock'
+export type Page = 'dashboard' | 'solicitudes' | 'nueva-solicitud' | 'stock' | 'usuarios'
 
 export interface User {
   id: string
   nombre: string
   email: string
   rol: Rol
+  activo: boolean
 }
 
 export interface Receta {

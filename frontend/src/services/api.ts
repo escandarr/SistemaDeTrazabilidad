@@ -1,5 +1,5 @@
 // Capa de acceso a la API del backend (FastAPI).
-import type { MaterialCalculado, Producto, Receta, Solicitud, User } from '../types'
+import type { MaterialCalculado, Producto, Receta, Rol, Solicitud, User } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1'
 
@@ -82,6 +82,23 @@ export const api = {
   crearSolicitud: (payload: CrearSolicitudPayload) =>
     request<Solicitud>('/solicitudes', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  // --- Gestión de usuarios (solo admin) ---
+  listUsuarios: () => request<User[]>('/usuarios'),
+
+  crearUsuario: (payload: { nombre: string; email: string; password: string; rol: Rol }) =>
+    request<User>('/usuarios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  actualizarUsuario: (id: string, payload: Partial<{ nombre: string; rol: Rol; activo: boolean; password: string }>) =>
+    request<User>(`/usuarios/${id}`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
