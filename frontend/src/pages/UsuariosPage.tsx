@@ -142,20 +142,20 @@ export function UsuariosPage({ currentUserId }: Props) {
           <form className="modal" onClick={e => e.stopPropagation()} onSubmit={crear}>
             <h3 className="modal__title">Nuevo usuario</h3>
             <div className="form-group">
-              <label className="form-label">Nombre</label>
-              <input className="form-input" value={nombre} onChange={e => setNombre(e.target.value)} required />
+              <label className="form-label" htmlFor="nu-nombre">Nombre</label>
+              <input id="nu-nombre" className="form-input" value={nombre} onChange={e => setNombre(e.target.value)} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Email</label>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+              <label className="form-label" htmlFor="nu-email">Email</label>
+              <input id="nu-email" className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Contraseña</label>
-              <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+              <label className="form-label" htmlFor="nu-password">Contraseña</label>
+              <input id="nu-password" className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
             </div>
             <div className="form-group">
-              <label className="form-label">Rol</label>
-              <select className="form-input" value={rol} onChange={e => setRol(e.target.value as Rol)}>
+              <label className="form-label" htmlFor="nu-rol">Rol</label>
+              <select id="nu-rol" className="form-input" value={rol} onChange={e => setRol(e.target.value as Rol)}>
                 {ROLES.map(r => <option key={r} value={r}>{ROL_LABELS[r]}</option>)}
               </select>
             </div>

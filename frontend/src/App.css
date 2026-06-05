@@ -552,3 +552,28 @@ tr:hover td { background: #fafbfc; }
   .topbar { padding: 0 16px; }
   .shell__content { padding: 18px 16px; }
 }
+
+/* === UI/UX polish (ui-ux-pro-max) === */
+.nav-item__left { display: flex; align-items: center; gap: 10px; }
+.nav-item svg, .metric svg { flex-shrink: 0; }
+
+/* Focus visible (accesibilidad) */
+:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 2px; }
+.sidebar :focus-visible { outline-color: #93c5fd; }
+
+/* Cifras tabulares para columnas de datos */
+.td--num, .metric__value, .resumen-item__amount, table td { font-variant-numeric: tabular-nums; }
+
+/* Feedback de pulsado + easing natural */
+.btn { transition: background 0.15s ease-out, box-shadow 0.15s ease-out, transform 0.08s ease-out, opacity 0.15s ease-out; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+/* Respeta prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

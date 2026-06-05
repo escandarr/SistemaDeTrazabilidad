@@ -149,16 +149,16 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
             <div className="card__sub">{receta.descripcion}</div>
           </div>
           <div className="form-group">
-            <label className="form-label">Nombre de la obra</label>
-            <input className="form-input" type="text" placeholder="Ej: Planta Maipú Norte" value={obra} onChange={e => setObra(e.target.value)} />
+            <label className="form-label" htmlFor="ns-obra">Nombre de la obra</label>
+            <input id="ns-obra" className="form-input" type="text" placeholder="Ej: Planta Maipú Norte" value={obra} onChange={e => setObra(e.target.value)} />
           </div>
           <div className="form-group">
-            <label className="form-label">Superficie (m²)</label>
-            <input className="form-input" type="number" placeholder="Ej: 150" min="1" value={m2} onChange={e => setM2(e.target.value)} />
+            <label className="form-label" htmlFor="ns-m2">Superficie (m²)</label>
+            <input id="ns-m2" className="form-input" type="number" inputMode="decimal" placeholder="Ej: 150" min="1" value={m2} onChange={e => setM2(e.target.value)} />
           </div>
           <div className="form-group">
-            <label className="form-label">Holgura técnica (% extra, opcional)</label>
-            <input className="form-input" type="number" placeholder="0" min="0" value={holgura} onChange={e => setHolgura(e.target.value)} />
+            <label className="form-label" htmlFor="ns-holgura">Holgura técnica (% extra, opcional)</label>
+            <input id="ns-holgura" className="form-input" type="number" inputMode="numeric" placeholder="0" min="0" value={holgura} onChange={e => setHolgura(e.target.value)} />
           </div>
           <div className="nav-row">
             <button className="btn btn--secondary" onClick={() => setStep(0)}>← Atrás</button>

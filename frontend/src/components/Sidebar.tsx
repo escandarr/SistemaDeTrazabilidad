@@ -1,29 +1,44 @@
+import type { ComponentType, SVGProps } from 'react'
 import type { Page, Rol, User } from '../types'
 import { ROL_LABELS } from '../types'
+import {
+  ClipboardIcon,
+  FilePlusIcon,
+  HomeIcon,
+  PackageIcon,
+  ReturnIcon,
+  ScaleIcon,
+  TruckIcon,
+  UsersIcon,
+} from './icons'
+
+type IconType = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>
 
 interface NavItem {
   id: Page
   label: string
   roles: Rol[]
+  Icon: IconType
 }
 
 const NAV: NavItem[] = [
-  { id: 'dashboard', label: 'Inicio', roles: ['administrador', 'supervisor', 'operario_bodega', 'jefe_bodega'] },
-  { id: 'solicitudes', label: 'Solicitudes', roles: ['administrador', 'supervisor', 'jefe_bodega'] },
-  { id: 'nueva-solicitud', label: 'Nueva solicitud', roles: ['administrador', 'supervisor'] },
-  { id: 'stock', label: 'Inventario', roles: ['administrador', 'supervisor', 'jefe_bodega'] },
-  { id: 'usuarios', label: 'Usuarios', roles: ['administrador'] },
+  { id: 'dashboard', label: 'Inicio', roles: ['administrador', 'supervisor', 'operario_bodega', 'jefe_bodega'], Icon: HomeIcon },
+  { id: 'solicitudes', label: 'Solicitudes', roles: ['administrador', 'supervisor', 'jefe_bodega'], Icon: ClipboardIcon },
+  { id: 'nueva-solicitud', label: 'Nueva solicitud', roles: ['administrador', 'supervisor'], Icon: FilePlusIcon },
+  { id: 'stock', label: 'Inventario', roles: ['administrador', 'supervisor', 'jefe_bodega'], Icon: PackageIcon },
+  { id: 'usuarios', label: 'Usuarios', roles: ['administrador'], Icon: UsersIcon },
 ]
 
 interface SoonItem {
   label: string
   roles: Rol[]
+  Icon: IconType
 }
 
 const SOON: SoonItem[] = [
-  { label: 'Picking', roles: ['administrador', 'jefe_bodega', 'operario_bodega'] },
-  { label: 'Despacho', roles: ['administrador', 'jefe_bodega'] },
-  { label: 'Devoluciones', roles: ['administrador', 'jefe_bodega', 'operario_bodega'] },
+  { label: 'Picking', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], Icon: ScaleIcon },
+  { label: 'Despacho', roles: ['administrador', 'jefe_bodega'], Icon: TruckIcon },
+  { label: 'Devoluciones', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], Icon: ReturnIcon },
 ]
 
 interface Props {
@@ -48,21 +63,22 @@ export function Sidebar({ user, page, navigate, logout }: Props) {
         </div>
       </div>
 
-      <nav className="sidebar__nav">
-        {items.map(i => (
+      <nav className="sidebar__nav" aria-label="Navegación principal">
+        {items.map(({ id, label, Icon }) => (
           <button
-            key={i.id}
-            className={`nav-item ${page === i.id ? 'nav-item--active' : ''}`}
-            onClick={() => navigate(i.id)}
+            key={id}
+            className={`nav-item ${page === id ? 'nav-item--active' : ''}`}
+            onClick={() => navigate(id)}
+            aria-current={page === id ? 'page' : undefined}
           >
-            {i.label}
+            <span className="nav-item__left"><Icon size={18} /> {label}</span>
           </button>
         ))}
 
         {soon.length > 0 && <div className="sidebar__section">Próximamente</div>}
-        {soon.map(i => (
-          <div key={i.label} className="nav-item nav-item--soon">
-            {i.label}
+        {soon.map(({ label, Icon }) => (
+          <div key={label} className="nav-item nav-item--soon">
+            <span className="nav-item__left"><Icon size={18} /> {label}</span>
             <span className="nav-pill">Pronto</span>
           </div>
         ))}
@@ -74,7 +90,7 @@ export function Sidebar({ user, page, navigate, logout }: Props) {
           <div className="sidebar__user-name">{user.nombre}</div>
           <div className="sidebar__user-rol">{ROL_LABELS[user.rol]}</div>
         </div>
-        <button className="sidebar__logout" onClick={logout} title="Cerrar sesión">Salir</button>
+        <button className="sidebar__logout" onClick={logout}>Salir</button>
       </div>
     </aside>
   )

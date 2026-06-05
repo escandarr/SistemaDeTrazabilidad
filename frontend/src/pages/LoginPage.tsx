@@ -37,8 +37,9 @@ export function LoginPage({ onLoggedIn }: Props) {
         <p className="login__label">Iniciar sesión</p>
 
         <div className="form-group">
-          <label className="form-label">Email</label>
+          <label className="form-label" htmlFor="login-email">Email</label>
           <input
+            id="login-email"
             className="form-input"
             type="email"
             value={email}
@@ -50,8 +51,9 @@ export function LoginPage({ onLoggedIn }: Props) {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Contraseña</label>
+          <label className="form-label" htmlFor="login-password">Contraseña</label>
           <input
+            id="login-password"
             className="form-input"
             type="password"
             value={password}
