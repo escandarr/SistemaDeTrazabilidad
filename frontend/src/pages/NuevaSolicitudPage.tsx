@@ -91,7 +91,7 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
       <div className="success-screen">
         <h2 className="success-screen__title">Solicitud creada</h2>
         <p className="success-screen__sub">
-          SOL-{String(solId).padStart(3, '0')} ha sido registrada y notificada a bodega.
+          SOL-{String(solId).padStart(3, '0')} quedó registrada con sus materiales cubicados.
         </p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
           <button className="btn btn--primary" onClick={() => navigate('solicitudes')}>Ver solicitudes</button>
@@ -119,8 +119,8 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
         <>
           <h3 className="section-title">Sistema de piso</h3>
           {recetas.length === 0 && (
-            <div className="card" style={{ textAlign: 'center', color: '#64748b' }}>
-              No hay sistemas configurados.
+            <div className="empty">
+              No hay sistemas de piso configurados. Pide al administrador que cargue las recetas.
             </div>
           )}
           {recetas.map(r => (
@@ -135,7 +135,7 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
           ))}
           <div className="nav-row">
             <button className="btn btn--secondary" onClick={() => navigate('dashboard')}>Cancelar</button>
-            <button className="btn btn--primary" disabled={!receta} onClick={() => setStep(1)}>Siguiente →</button>
+            <button className="btn btn--primary" disabled={!receta} onClick={() => setStep(1)}>Siguiente</button>
           </div>
         </>
       )}
@@ -161,9 +161,9 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
             <input id="ns-holgura" className="form-input" type="number" inputMode="numeric" placeholder="0" min="0" value={holgura} onChange={e => setHolgura(e.target.value)} />
           </div>
           <div className="nav-row">
-            <button className="btn btn--secondary" onClick={() => setStep(0)}>← Atrás</button>
+            <button className="btn btn--secondary" onClick={() => setStep(0)}>Atrás</button>
             <button className="btn btn--primary" disabled={!obra.trim() || superficie <= 0 || cubicando} onClick={irAResumen}>
-              {cubicando ? 'Calculando…' : 'Siguiente →'}
+              {cubicando ? 'Calculando…' : 'Siguiente'}
             </button>
           </div>
         </>
@@ -197,7 +197,7 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
                     <div className="resumen-item__name">{m.nombre}</div>
                     <div className="resumen-item__stock">Stock disponible: {m.stockActual} {m.unidad}</div>
                   </div>
-                  <div className="resumen-item__amount" style={{ color: ok ? 'var(--slate-900)' : 'var(--red-600)' }}>
+                  <div className="resumen-item__amount" style={{ color: ok ? 'var(--tinta)' : 'var(--rojo-600)' }}>
                     {m.total} {m.unidad}
                   </div>
                 </div>
@@ -206,7 +206,7 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
           </div>
 
           <div className="nav-row">
-            <button className="btn btn--secondary" onClick={() => setStep(1)} disabled={saving}>← Atrás</button>
+            <button className="btn btn--secondary" onClick={() => setStep(1)} disabled={saving}>Atrás</button>
             <button className="btn btn--primary" onClick={handleConfirm} disabled={saving}>
               {saving ? 'Creando…' : 'Confirmar'}
             </button>

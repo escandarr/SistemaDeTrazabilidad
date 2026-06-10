@@ -11,8 +11,8 @@ export default defineConfig({
         name: 'Sistema de Trazabilidad Grupo LC',
         short_name: 'Trazabilidad',
         description: 'Gestión de inventario y despacho de materias primas',
-        theme_color: '#1e3a5f',
-        background_color: '#ffffff',
+        theme_color: '#16191d',
+        background_color: '#16191d',
         display: 'standalone',
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

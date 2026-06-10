@@ -55,7 +55,7 @@ export function StockPage({ stock }: Props) {
                 <tr key={s.codigo_avesoft}>
                   <td style={{ fontWeight: 500 }}>
                     {s.descripcion}
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>{s.codigo_avesoft}</div>
+                    <div className="td--sub">{s.codigo_avesoft}</div>
                   </td>
                   <td>
                     <span className="td--num">{s.stock_actual} {s.unidad_medida}</span>
@@ -63,7 +63,7 @@ export function StockPage({ stock }: Props) {
                       <div className="stock-bar__fill" style={{ width: `${pct}%` }} />
                     </div>
                   </td>
-                  <td className="td--num" style={{ color: '#64748b' }}>{s.stock_minimo} {s.unidad_medida}</td>
+                  <td className="td--num td--muted">{s.stock_minimo} {s.unidad_medida}</td>
                   <td>
                     <span className={`badge badge--${status}`}>{STATUS_LABELS[status]}</span>
                   </td>

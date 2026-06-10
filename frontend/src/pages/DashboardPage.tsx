@@ -52,7 +52,7 @@ export function DashboardPage({ user, solicitudes, stock, navigate }: Props) {
       </div>
 
       {recent.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: 40, color: '#64748b' }}>Sin solicitudes aún</div>
+        <div className="empty">Aún no hay solicitudes registradas.</div>
       ) : (
         <div className="table-wrapper">
           <table>
@@ -62,9 +62,9 @@ export function DashboardPage({ user, solicitudes, stock, navigate }: Props) {
             <tbody>
               {recent.map(s => (
                 <tr key={s.id}>
-                  <td style={{ fontWeight: 600 }}>SOL-{String(s.id).padStart(3, '0')}</td>
+                  <td className="td--code">SOL-{String(s.id).padStart(3, '0')}</td>
                   <td>{s.obra}</td>
-                  <td style={{ color: '#64748b' }}>{s.sistema}</td>
+                  <td className="td--muted">{s.sistema}</td>
                   <td className="td--num">{s.m2}</td>
                   <td><span className={`badge badge--${s.estado}`}>{ESTADO_LABELS[s.estado]}</span></td>
                 </tr>

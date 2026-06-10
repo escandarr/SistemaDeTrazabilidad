@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function LoginPage({ onLoggedIn }: Props) {
-  const [email, setEmail] = useState('admin@grupolc.cl')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -30,7 +30,7 @@ export function LoginPage({ onLoggedIn }: Props) {
     <div className="login">
       <div className="login__brand">
         <h1 className="login__title">Grupo LC</h1>
-        <p className="login__sub">Sistema de Trazabilidad — MVP</p>
+        <p className="login__sub">Trazabilidad de materiales · bodega y obra</p>
       </div>
 
       <form className="login__card" onSubmit={handleSubmit}>
@@ -44,7 +44,7 @@ export function LoginPage({ onLoggedIn }: Props) {
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            placeholder="tu@grupolc.cl"
+            placeholder="nombre@grupolc.cl"
             autoComplete="username"
             required
           />
@@ -71,13 +71,13 @@ export function LoginPage({ onLoggedIn }: Props) {
         )}
 
         <button className="btn btn--primary btn--full btn--lg" type="submit" disabled={loading}>
-          {loading ? 'Ingresando…' : 'Ingresar →'}
+          {loading ? 'Ingresando…' : 'Ingresar'}
         </button>
-
-        <p style={{ marginTop: 14, fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>
-          Demo: admin@grupolc.cl / admin1234
-        </p>
       </form>
+
+      <p className="login__foot">
+        ¿No tienes acceso? Solicítalo al administrador del sistema.
+      </p>
     </div>
   )
 }

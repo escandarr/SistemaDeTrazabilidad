@@ -79,13 +79,13 @@ export function UsuariosPage({ currentUserId }: Props) {
     <>
       <div className="content-head">
         <h2 className="section-title" style={{ marginBottom: 0 }}>Usuarios del sistema</h2>
-        <button className="btn btn--primary" onClick={() => setModal(true)}>+ Nuevo usuario</button>
+        <button className="btn btn--primary" onClick={() => setModal(true)}>Nuevo usuario</button>
       </div>
 
       {error && <div className="alert alert--warning">{error}</div>}
 
       {loading ? (
-        <div className="card" style={{ textAlign: 'center', color: '#64748b' }}>Cargando…</div>
+        <div className="empty">Cargando usuarios…</div>
       ) : (
         <div className="table-wrapper">
           <table>
@@ -105,7 +105,7 @@ export function UsuariosPage({ currentUserId }: Props) {
                     {u.nombre}
                     {u.id === currentUserId && <span className="tag-you">tú</span>}
                   </td>
-                  <td style={{ color: '#64748b' }}>{u.email}</td>
+                  <td className="td--muted">{u.email}</td>
                   <td>
                     <select
                       className="role-select"
