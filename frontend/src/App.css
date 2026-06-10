@@ -359,6 +359,29 @@ tr:hover td { background: #fafbfb; }
 .stock-bar--low .stock-bar__fill { background: var(--ambar-500); }
 .stock-bar--critical .stock-bar__fill { background: var(--rojo-600); }
 
+/* === PESAJE (picking / devoluciones) === */
+.item-grid { display: grid; gap: 12px; }
+
+.pesaje-row { display: flex; gap: 8px; align-items: stretch; }
+.pesaje-row .form-input { flex: 1; min-width: 0; }
+.pesaje-row .btn { flex-shrink: 0; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  font-family: var(--font-data); font-size: 12px;
+  background: var(--losa-100); border: 1px solid var(--losa-200);
+  padding: 3px 8px; border-radius: var(--radius-sm);
+  display: inline-flex; gap: 6px; align-items: center;
+}
+.chip button { border: none; background: none; color: var(--gris-600); font-size: 14px; padding: 0; line-height: 1; }
+.chip button:hover { color: var(--rojo-600); }
+
+.pesaje-total { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--gris-600); }
+.pesaje-total strong { font-family: var(--font-data); color: var(--tinta); font-weight: 600; }
+
+.badge--pendiente { background: var(--ambar-100); color: var(--ambar-text); }
+.badge--confirmado { background: var(--ok-100); color: var(--ok-600); }
+
 /* === USUARIOS === */
 .role-select {
   border: 1px solid var(--losa-200); border-radius: var(--radius-sm);

@@ -1,5 +1,19 @@
 // Capa de acceso a la API del backend (FastAPI).
-import type { MaterialCalculado, Producto, Receta, Rol, Solicitud, User } from '../types'
+import type {
+  DespachoPendiente,
+  DespachoRow,
+  DevolucionAbierta,
+  DevolucionRow,
+  MaterialCalculado,
+  PickingDetail,
+  PickingItem,
+  PickingRow,
+  Producto,
+  Receta,
+  Rol,
+  Solicitud,
+  User,
+} from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1'
 
@@ -102,4 +116,73 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
+
+  // --- Picking (RF03) ---
+  listPicking: () => request<PickingRow[]>('/picking'),
+
+  iniciarPicking: (solicitud_id: number) =>
+    request<PickingDetail>('/picking/iniciar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ solicitud_id }),
+    }),
+
+  getPicking: (pickingId: number) => request<PickingDetail>(`/picking/${pickingId}`),
+
+  pesarItem: (pickingId: number, itemId: number, pesos_bultos: number[]) =>
+    request<PickingItem>(`/picking/${pickingId}/items/${itemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pesos_bultos }),
+    }),
+
+  confirmarPicking: (pickingId: number) =>
+    request<PickingDetail>(`/picking/${pickingId}/confirmar`, { method: 'POST' }),
+
+  // --- Despacho (RF04) ---
+  listDespachosPendientes: () => request<DespachoPendiente[]>('/despacho/pendientes'),
+
+  listDespachos: () => request<DespachoRow[]>('/despacho'),
+
+  crearDespacho: (picking_id: number, guia_ref: string | null) =>
+    request<DespachoRow>('/despacho', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ picking_id, guia_ref }),
+    }),
+
+  cerrarSinDevolucion: (despachoId: number) =>
+    request<DespachoRow>(`/despacho/${despachoId}/cerrar`, { method: 'POST' }),
+
+  // --- Devoluciones (RF05) ---
+  listDespachosAbiertos: () => request<DevolucionAbierta[]>('/devoluciones/abiertos'),
+
+  listDevoluciones: () => request<DevolucionRow[]>('/devoluciones'),
+
+  registrarDevolucion: (payload: {
+    despacho_id: number
+    guia_ref: string | null
+    items: { producto_id: string; pesos_bultos: number[] }[]
+  }) =>
+    request<DevolucionRow>('/devoluciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  // Descarga autenticada de los CSV batch para Avesoft (P2 / P3).
+  async descargarCsv(path: string, filename: string): Promise<void> {
+    const token = getToken()
+    const res = await fetch(`${BASE_URL}${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) throw new Error(`No se pudo descargar el archivo (error ${res.status})`)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  },
 }

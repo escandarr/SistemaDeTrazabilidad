@@ -27,6 +27,18 @@ def resolver_tara(producto: _Producto) -> float:
     return 0.0
 
 
+def tara_unitaria(producto) -> float:
+    """Tara por bulto según cómo se cuenta el producto.
+
+    El material pesado en báscula (kg, l) arrastra el envase; lo contado por
+    unidad (brochas, guantes) no lleva tara.
+    """
+    unidad = getattr(producto, "unidad_medida", None)
+    if getattr(unidad, "value", unidad) == "un":
+        return 0.0
+    return resolver_tara(producto)
+
+
 def calcular_peso_neto(peso_bruto: float, peso_tara: float) -> float:
     """Ecuación (1): M_neto = M_bruto(báscula) − M_tara(proveedor)."""
     return round(float(peso_bruto) - float(peso_tara), 3)

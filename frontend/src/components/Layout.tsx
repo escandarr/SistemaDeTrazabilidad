@@ -8,6 +8,9 @@ const TITLES: Record<Page, string> = {
   'nueva-solicitud': 'Nueva solicitud',
   stock: 'Inventario',
   usuarios: 'Usuarios',
+  picking: 'Picking',
+  despacho: 'Despacho',
+  devoluciones: 'Devoluciones',
 }
 
 interface Props {

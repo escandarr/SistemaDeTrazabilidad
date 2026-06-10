@@ -9,6 +9,9 @@ import { NuevaSolicitudPage } from './pages/NuevaSolicitudPage'
 import { SolicitudesPage } from './pages/SolicitudesPage'
 import { StockPage } from './pages/StockPage'
 import { UsuariosPage } from './pages/UsuariosPage'
+import { PickingPage } from './pages/PickingPage'
+import { DespachoPage } from './pages/DespachoPage'
+import { DevolucionesPage } from './pages/DevolucionesPage'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -101,6 +104,15 @@ function App() {
       break
     case 'usuarios':
       content = <UsuariosPage currentUserId={user.id} />
+      break
+    case 'picking':
+      content = <PickingPage user={user} onChanged={refresh} />
+      break
+    case 'despacho':
+      content = <DespachoPage onChanged={refresh} />
+      break
+    case 'devoluciones':
+      content = <DevolucionesPage onChanged={refresh} />
       break
   }
 

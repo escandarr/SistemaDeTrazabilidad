@@ -21,24 +21,37 @@ interface NavItem {
   Icon: IconType
 }
 
-const NAV: NavItem[] = [
-  { id: 'dashboard', label: 'Inicio', roles: ['administrador', 'supervisor', 'operario_bodega', 'jefe_bodega'], Icon: HomeIcon },
-  { id: 'solicitudes', label: 'Solicitudes', roles: ['administrador', 'supervisor', 'jefe_bodega'], Icon: ClipboardIcon },
-  { id: 'nueva-solicitud', label: 'Nueva solicitud', roles: ['administrador', 'supervisor'], Icon: FilePlusIcon },
-  { id: 'stock', label: 'Inventario', roles: ['administrador', 'supervisor', 'jefe_bodega'], Icon: PackageIcon },
-  { id: 'usuarios', label: 'Usuarios', roles: ['administrador'], Icon: UsersIcon },
-]
-
-interface SoonItem {
-  label: string
-  roles: Rol[]
-  Icon: IconType
+interface NavGroup {
+  label: string | null
+  items: NavItem[]
 }
 
-const SOON: SoonItem[] = [
-  { label: 'Picking', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], Icon: ScaleIcon },
-  { label: 'Despacho', roles: ['administrador', 'jefe_bodega'], Icon: TruckIcon },
-  { label: 'Devoluciones', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], Icon: ReturnIcon },
+// El orden de los grupos refleja el flujo real del material:
+// obra solicita → bodega prepara, despacha y recibe de vuelta.
+const GROUPS: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { id: 'dashboard', label: 'Inicio', roles: ['administrador', 'supervisor', 'operario_bodega', 'jefe_bodega'], Icon: HomeIcon },
+      { id: 'solicitudes', label: 'Solicitudes', roles: ['administrador', 'supervisor', 'jefe_bodega'], Icon: ClipboardIcon },
+      { id: 'nueva-solicitud', label: 'Nueva solicitud', roles: ['administrador', 'supervisor'], Icon: FilePlusIcon },
+      { id: 'stock', label: 'Inventario', roles: ['administrador', 'supervisor', 'jefe_bodega'], Icon: PackageIcon },
+    ],
+  },
+  {
+    label: 'Bodega',
+    items: [
+      { id: 'picking', label: 'Picking', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], Icon: ScaleIcon },
+      { id: 'despacho', label: 'Despacho', roles: ['administrador', 'jefe_bodega'], Icon: TruckIcon },
+      { id: 'devoluciones', label: 'Devoluciones', roles: ['administrador', 'jefe_bodega', 'operario_bodega'], Icon: ReturnIcon },
+    ],
+  },
+  {
+    label: 'Administración',
+    items: [
+      { id: 'usuarios', label: 'Usuarios', roles: ['administrador'], Icon: UsersIcon },
+    ],
+  },
 ]
 
 interface Props {
@@ -49,9 +62,9 @@ interface Props {
 }
 
 export function Sidebar({ user, page, navigate, logout }: Props) {
-  const items = NAV.filter(i => i.roles.includes(user.rol))
-  const soon = SOON.filter(i => i.roles.includes(user.rol))
   const iniciales = user.nombre.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
+  const grupos = GROUPS.map(g => ({ ...g, items: g.items.filter(i => i.roles.includes(user.rol)) }))
+    .filter(g => g.items.length > 0)
 
   return (
     <aside className="sidebar">
@@ -64,22 +77,19 @@ export function Sidebar({ user, page, navigate, logout }: Props) {
       </div>
 
       <nav className="sidebar__nav" aria-label="Navegación principal">
-        {items.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            className={`nav-item ${page === id ? 'nav-item--active' : ''}`}
-            onClick={() => navigate(id)}
-            aria-current={page === id ? 'page' : undefined}
-          >
-            <span className="nav-item__left"><Icon size={18} /> {label}</span>
-          </button>
-        ))}
-
-        {soon.length > 0 && <div className="sidebar__section">Próximamente</div>}
-        {soon.map(({ label, Icon }) => (
-          <div key={label} className="nav-item nav-item--soon">
-            <span className="nav-item__left"><Icon size={18} /> {label}</span>
-            <span className="nav-pill">Pronto</span>
+        {grupos.map(g => (
+          <div key={g.label ?? 'principal'} className="sidebar__group">
+            {g.label && <div className="sidebar__section">{g.label}</div>}
+            {g.items.map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                className={`nav-item ${page === id ? 'nav-item--active' : ''}`}
+                onClick={() => navigate(id)}
+                aria-current={page === id ? 'page' : undefined}
+              >
+                <span className="nav-item__left"><Icon size={18} /> {label}</span>
+              </button>
+            ))}
           </div>
         ))}
       </nav>
