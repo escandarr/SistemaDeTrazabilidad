@@ -4,14 +4,19 @@ import type {
   DespachoRow,
   DevolucionAbierta,
   DevolucionRow,
+  ImportResult,
   MaterialCalculado,
   PickingDetail,
   PickingItem,
   PickingRow,
   Producto,
+  Proveedor,
   Receta,
+  RecetaDetalle,
+  RecetaFull,
   Rol,
   Solicitud,
+  UnidadMedida,
   User,
 } from '../types'
 
@@ -139,6 +144,9 @@ export const api = {
   confirmarPicking: (pickingId: number) =>
     request<PickingDetail>(`/picking/${pickingId}/confirmar`, { method: 'POST' }),
 
+  sustituirPickingItem: (pickingId: number, itemId: number) =>
+    request<PickingItem>(`/picking/${pickingId}/items/${itemId}/sustituir`, { method: 'POST' }),
+
   // --- Despacho (RF04) ---
   listDespachosPendientes: () => request<DespachoPendiente[]>('/despacho/pendientes'),
 
@@ -170,7 +178,77 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  // Descarga autenticada de los CSV batch para Avesoft (P2 / P3).
+  // --- Catálogo / panel de administración de materiales (3.7) ---
+  listProductosAdmin: () => request<Producto[]>('/catalogo/productos'),
+
+  crearProducto: (payload: {
+    codigo_avesoft: string
+    descripcion: string
+    unidad_medida: UnidadMedida
+    proveedor_id: number | null
+    peso_tara_kg: number | null
+    stock_actual: number
+    stock_minimo: number
+    sustituto_id: string | null
+  }) =>
+    request<Producto>('/catalogo/productos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  actualizarProducto: (codigo: string, payload: Partial<Omit<Producto, 'codigo_avesoft'>>) =>
+    request<Producto>(`/catalogo/productos/${encodeURIComponent(codigo)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  eliminarProducto: (codigo: string) =>
+    request<void>(`/catalogo/productos/${encodeURIComponent(codigo)}`, { method: 'DELETE' }),
+
+  importarProductos: (file: File) => {
+    const fd = new FormData()
+    fd.append('archivo', file)
+    return request<ImportResult>('/catalogo/productos/importar', { method: 'POST', body: fd })
+  },
+
+  listProveedores: () => request<Proveedor[]>('/catalogo/proveedores'),
+
+  crearProveedor: (payload: { nombre: string; peso_tara_kg: number }) =>
+    request<Proveedor>('/catalogo/proveedores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  actualizarProveedor: (id: number, payload: Partial<{ nombre: string; peso_tara_kg: number }>) =>
+    request<Proveedor>(`/catalogo/proveedores/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  eliminarProveedor: (id: number) =>
+    request<void>(`/catalogo/proveedores/${id}`, { method: 'DELETE' }),
+
+  listRecetasFull: () => request<RecetaFull[]>('/catalogo/recetas'),
+
+  crearReceta: (payload: { nombre_sistema: string; descripcion: string | null; detalle: RecetaDetalle[] }) =>
+    request<RecetaFull>('/catalogo/recetas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  actualizarReceta: (id: number, payload: Partial<{ descripcion: string | null; activa: boolean; detalle: RecetaDetalle[] }>) =>
+    request<RecetaFull>(`/catalogo/recetas/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  // Descarga autenticada de los CSV batch para Avesoft (P2 / P3) y exports.
   async descargarCsv(path: string, filename: string): Promise<void> {
     const token = getToken()
     const res = await fetch(`${BASE_URL}${path}`, {

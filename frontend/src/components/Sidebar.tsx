@@ -5,6 +5,7 @@ import {
   ClipboardIcon,
   FilePlusIcon,
   HomeIcon,
+  LayersIcon,
   PackageIcon,
   ReturnIcon,
   ScaleIcon,
@@ -49,6 +50,7 @@ const GROUPS: NavGroup[] = [
   {
     label: 'Administración',
     items: [
+      { id: 'materiales', label: 'Materiales', roles: ['administrador'], Icon: LayersIcon },
       { id: 'usuarios', label: 'Usuarios', roles: ['administrador'], Icon: UsersIcon },
     ],
   },

@@ -2,6 +2,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -72,6 +73,40 @@ async def listar_solicitudes(
         .order_by(Solicitud.creado_at.desc())
     )
     return [_to_list_item(s) for s in result.scalars().all()]
+
+
+@router.get("/exportar")
+async def exportar_solicitudes(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _: Annotated[Usuario, Depends(get_current_user)],
+):
+    """Exporta el historial de solicitudes a CSV."""
+    result = await db.execute(
+        select(Solicitud)
+        .options(selectinload(Solicitud.centro_costo), selectinload(Solicitud.receta))
+        .order_by(Solicitud.creado_at.desc())
+    )
+    cols = ["codigo", "obra", "sistema", "m2", "estado", "fecha"]
+    lineas = [";".join(cols)]
+    for s in result.scalars().all():
+        lineas.append(
+            ";".join(
+                [
+                    f"SOL-{s.id:03d}",
+                    s.centro_costo.nombre_obra,
+                    _sistema_label(s.receta),
+                    f"{float(s.m2):.2f}",
+                    s.estado.value,
+                    s.creado_at.date().isoformat(),
+                ]
+            )
+        )
+    contenido = "\r\n".join(lineas) + "\r\n"
+    return Response(
+        content=contenido,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="solicitudes.csv"'},
+    )
 
 
 @router.post("/cubicar", response_model=list[MaterialCalculadoOut])

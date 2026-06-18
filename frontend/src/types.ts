@@ -10,9 +10,12 @@ export type Page =
   | 'nueva-solicitud'
   | 'stock'
   | 'usuarios'
+  | 'materiales'
   | 'picking'
   | 'despacho'
   | 'devoluciones'
+
+export type UnidadMedida = 'kg' | 'l' | 'un'
 
 export type EstadoPicking = 'pendiente' | 'confirmado' | 'rechazado'
 
@@ -33,7 +36,7 @@ export interface Receta {
 export interface Producto {
   codigo_avesoft: string
   descripcion: string
-  unidad_medida: string
+  unidad_medida: UnidadMedida
   proveedor_id: number | null
   peso_tara_kg: number | null
   stock_actual: number
@@ -77,6 +80,10 @@ export interface PickingItem {
   peso_bruto: number | null
   peso_tara: number | null
   peso_neto: number | null
+  stock_actual: number
+  sustituto_id: string | null
+  sustituto_descripcion: string | null
+  sustituto_stock: number | null
 }
 
 export interface PickingDetail {
@@ -159,4 +166,40 @@ export const ESTADO_LABELS: Record<EstadoSolicitud, string> = {
   en_picking: 'En Picking',
   despachada: 'Despachada',
   cerrada: 'Cerrada',
+}
+
+export const SISTEMA_LABELS: Record<string, string> = {
+  mma: 'MMA',
+  epoxi: 'Epóxico',
+  uretano: 'Uretano',
+}
+
+// --- Catálogo / panel de administración de materiales (3.7) ---
+
+export interface Proveedor {
+  id: number
+  nombre: string
+  peso_tara_kg: number
+}
+
+export interface RecetaDetalle {
+  id?: number
+  producto_id: string
+  cantidad_por_m2: number
+  descripcion?: string | null
+}
+
+export interface RecetaFull {
+  id: number
+  nombre_sistema: string
+  descripcion: string | null
+  activa: boolean
+  detalle: RecetaDetalle[]
+}
+
+export interface ImportResult {
+  total_filas: number
+  creados: number
+  actualizados: number
+  errores: string[]
 }

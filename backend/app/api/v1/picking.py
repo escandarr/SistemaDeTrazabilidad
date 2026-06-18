@@ -49,6 +49,7 @@ def _sistema_label(receta: Receta) -> str:
 
 
 def _item_out(item: PickingItem) -> PickingItemOut:
+    sustituto = item.producto.sustituto
     return PickingItemOut(
         id=item.id,
         producto_id=item.producto_id,
@@ -59,6 +60,10 @@ def _item_out(item: PickingItem) -> PickingItemOut:
         peso_bruto=float(item.peso_bruto) if item.peso_bruto is not None else None,
         peso_tara=float(item.peso_tara) if item.peso_tara is not None else None,
         peso_neto=float(item.peso_neto) if item.peso_neto is not None else None,
+        stock_actual=float(item.producto.stock_actual),
+        sustituto_id=sustituto.codigo_avesoft if sustituto else None,
+        sustituto_descripcion=sustituto.descripcion if sustituto else None,
+        sustituto_stock=float(sustituto.stock_actual) if sustituto else None,
     )
 
 
@@ -79,9 +84,13 @@ async def _get_picking(db: AsyncSession, picking_id: int) -> tuple[Picking, Soli
         .where(Picking.id == picking_id)
         .options(
             selectinload(Picking.items).selectinload(PickingItem.producto).selectinload(Producto.proveedor),
+            selectinload(Picking.items).selectinload(PickingItem.producto).selectinload(Producto.sustituto),
             selectinload(Picking.solicitud).selectinload(Solicitud.centro_costo),
             selectinload(Picking.solicitud).selectinload(Solicitud.receta),
         )
+        # populate_existing: tras un swap de producto, sobrescribe la relación
+        # cacheada en la sesión (si no, devolvería el producto anterior).
+        .execution_options(populate_existing=True)
     )
     picking = result.scalar_one_or_none()
     if picking is None:
@@ -206,6 +215,38 @@ async def pesar_item(
     await db.commit()
     await db.refresh(item)
     return _item_out(item)
+
+
+@router.post("/{picking_id}/items/{item_id}/sustituir", response_model=PickingItemOut)
+async def sustituir_item(
+    picking_id: int,
+    item_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _: BodegaDep,
+):
+    """Reemplaza un producto por su equivalente de otro proveedor (RF07 / 3.G4b).
+
+    Pensado para quiebres de stock. Cambia el producto del ítem y reinicia su
+    pesaje, porque la tara y el código de salida pasan a ser los del equivalente.
+    """
+    picking, _solicitud = await _get_picking(db, picking_id)
+    if picking.estado == EstadoPicking.CONFIRMADO:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "El picking ya fue confirmado")
+    item = next((i for i in picking.items if i.id == item_id), None)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Ítem no encontrado en este picking")
+    if item.producto.sustituto_id is None:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "El producto no tiene equivalente configurado")
+
+    item.producto_id = item.producto.sustituto_id
+    item.peso_bruto = None
+    item.peso_tara = None
+    item.peso_neto = None
+    await db.commit()
+
+    picking, _solicitud = await _get_picking(db, picking_id)
+    nuevo = next(i for i in picking.items if i.id == item_id)
+    return _item_out(nuevo)
 
 
 @router.post("/{picking_id}/confirmar", response_model=PickingDetail)

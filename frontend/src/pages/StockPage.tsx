@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { api } from '../services/api'
 import type { Producto } from '../types'
 
 interface Props {
@@ -17,8 +19,18 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 export function StockPage({ stock }: Props) {
+  const [exportError, setExportError] = useState('')
   const criticals = stock.filter(s => getStatus(s.stock_actual, s.stock_minimo) === 'critical')
   const lows = stock.filter(s => getStatus(s.stock_actual, s.stock_minimo) === 'low')
+
+  async function exportar() {
+    setExportError('')
+    try {
+      await api.descargarCsv('/stock/exportar', 'inventario.csv')
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'No se pudo exportar')
+    }
+  }
 
   return (
     <>
@@ -28,12 +40,14 @@ export function StockPage({ stock }: Props) {
           solicitar reposición urgente a proveedor.
         </div>
       )}
+      {exportError && <div className="alert alert--warning">{exportError}</div>}
 
       <div className="content-head">
         <h2 className="section-title" style={{ marginBottom: 0 }}>Stock actual</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {criticals.length > 0 && <span className="badge badge--critical">{criticals.length} críticos</span>}
           {lows.length > 0 && <span className="badge badge--low">{lows.length} bajo</span>}
+          <button className="btn btn--secondary btn--sm" onClick={exportar}>Exportar CSV</button>
         </div>
       </div>
 

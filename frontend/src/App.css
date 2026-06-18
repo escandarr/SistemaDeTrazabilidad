@@ -359,6 +359,33 @@ tr:hover td { background: #fafbfb; }
 .stock-bar--low .stock-bar__fill { background: var(--ambar-500); }
 .stock-bar--critical .stock-bar__fill { background: var(--rojo-600); }
 
+/* === TABS (panel de materiales) === */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--losa-200); margin-bottom: 20px; }
+.tab {
+  background: none; border: none; padding: 10px 16px;
+  font-size: 14px; font-weight: 600; color: var(--gris-600);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab:hover { color: var(--tinta); }
+.tab--active { color: var(--tinta); border-bottom-color: var(--ambar-500); }
+
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* === FORM ROW (campos en línea) === */
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; min-width: 0; }
+@media (max-width: 540px) { .form-row { flex-direction: column; gap: 0; } }
+
+.modal--lg { max-width: 600px; max-height: 88vh; overflow-y: auto; }
+
+/* === CAJA SUSTITUTO (picking) === */
+.sustituto-box {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--ambar-100); border-radius: var(--radius-sm);
+  padding: 10px 12px; margin-bottom: 12px; font-size: 13px; color: var(--ambar-text);
+}
+.sustituto-box strong { font-family: var(--font-data); }
+
 /* === PESAJE (picking / devoluciones) === */
 .item-grid { display: grid; gap: 12px; }
 

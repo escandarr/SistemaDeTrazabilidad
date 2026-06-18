@@ -8,6 +8,7 @@ const TITLES: Record<Page, string> = {
   'nueva-solicitud': 'Nueva solicitud',
   stock: 'Inventario',
   usuarios: 'Usuarios',
+  materiales: 'Materiales',
   picking: 'Picking',
   despacho: 'Despacho',
   devoluciones: 'Devoluciones',

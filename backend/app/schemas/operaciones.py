@@ -32,6 +32,11 @@ class PickingItemOut(BaseModel):
     peso_bruto: float | None
     peso_tara: float | None
     peso_neto: float | None
+    stock_actual: float
+    # Equivalente entre proveedores (RF07 / 3.G4b) para usar ante quiebre de stock.
+    sustituto_id: str | None = None
+    sustituto_descripcion: str | None = None
+    sustituto_stock: float | None = None
 
 
 class PickingDetail(BaseModel):

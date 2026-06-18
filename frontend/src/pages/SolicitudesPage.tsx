@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { api } from '../services/api'
 import type { Page, Solicitud, User } from '../types'
 import { ESTADO_LABELS } from '../types'
 
@@ -9,16 +11,32 @@ interface Props {
 
 export function SolicitudesPage({ user, solicitudes, navigate }: Props) {
   const puedeCrear = user.rol === 'supervisor' || user.rol === 'administrador'
+  const [exportError, setExportError] = useState('')
+
+  async function exportar() {
+    setExportError('')
+    try {
+      await api.descargarCsv('/solicitudes/exportar', 'solicitudes.csv')
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'No se pudo exportar')
+    }
+  }
 
   return (
     <>
+      {exportError && <div className="alert alert--warning">{exportError}</div>}
       <div className="content-head">
         <h2 className="section-title" style={{ marginBottom: 0 }}>Todas las solicitudes</h2>
-        {puedeCrear && (
-          <button className="btn btn--primary" onClick={() => navigate('nueva-solicitud')}>
-            Nueva solicitud
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {solicitudes.length > 0 && (
+            <button className="btn btn--secondary" onClick={exportar}>Exportar CSV</button>
+          )}
+          {puedeCrear && (
+            <button className="btn btn--primary" onClick={() => navigate('nueva-solicitud')}>
+              Nueva solicitud
+            </button>
+          )}
+        </div>
       </div>
 
       {solicitudes.length === 0 ? (

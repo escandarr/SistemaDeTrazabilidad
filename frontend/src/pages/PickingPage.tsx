@@ -69,6 +69,17 @@ export function PickingPage({ user, onChanged }: Props) {
     }
   }
 
+  async function sustituir(itemId: number) {
+    if (!sel) return
+    setError('')
+    try {
+      const upd = await api.sustituirPickingItem(sel.id, itemId)
+      setSel({ ...sel, items: sel.items.map(i => (i.id === itemId ? upd : i)) })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo sustituir el producto')
+    }
+  }
+
   async function confirmar() {
     if (!sel) return
     setBusy(true)
@@ -130,6 +141,7 @@ export function PickingPage({ user, onChanged }: Props) {
 
               <div className="pesaje-total" style={{ marginTop: 0, marginBottom: 12 }}>
                 <span>Requerido <strong>{item.cantidad_teorica ?? '—'} {item.unidad}</strong></span>
+                <span>Stock <strong>{item.stock_actual} {item.unidad}</strong></span>
                 {item.unidad !== 'un' && <span>Tara por bulto <strong>{item.tara_unitaria} kg</strong></span>}
                 {item.peso_neto !== null && (
                   <span>
@@ -138,6 +150,21 @@ export function PickingPage({ user, onChanged }: Props) {
                   </span>
                 )}
               </div>
+
+              {!confirmado && item.sustituto_id && (
+                <div className="sustituto-box">
+                  <div>
+                    {item.cantidad_teorica !== null && item.stock_actual < item.cantidad_teorica && (
+                      <span className="badge badge--low" style={{ marginRight: 8 }}>Stock insuficiente</span>
+                    )}
+                    Equivalente: <strong>{item.sustituto_id}</strong> {item.sustituto_descripcion}
+                    {item.sustituto_stock !== null && <span className="td--muted"> · stock {item.sustituto_stock}</span>}
+                  </div>
+                  <button className="btn btn--secondary btn--sm" onClick={() => sustituir(item.id)}>
+                    Usar equivalente
+                  </button>
+                </div>
+              )}
 
               {!confirmado && (
                 <PesajeEditor
