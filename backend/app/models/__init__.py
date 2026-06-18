@@ -17,6 +17,7 @@ from app.models.enums import (
     SistemaPiso,
     UnidadMedida,
 )
+from app.models.invitacion import Invitacion
 from app.models.operaciones import (
     Despacho,
     Devolucion,
@@ -29,6 +30,7 @@ from app.models.usuario import Usuario
 
 __all__ = [
     "Usuario",
+    "Invitacion",
     "Proveedor",
     "Producto",
     "Receta",

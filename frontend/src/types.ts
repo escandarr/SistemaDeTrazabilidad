@@ -203,3 +203,25 @@ export interface ImportResult {
   actualizados: number
   errores: string[]
 }
+
+// --- Invitaciones de usuario (RF01) ---
+
+export interface InvitacionCreada {
+  email: string
+  nombre: string
+  token: string
+  enviado_por_correo: boolean
+}
+
+export interface BulkInvitacionResult {
+  total_filas: number
+  invitados: InvitacionCreada[]
+  errores: string[]
+}
+
+export interface InvitacionInfo {
+  valido: boolean
+  nombre: string | null
+  email: string | null
+  motivo: string | null
+}

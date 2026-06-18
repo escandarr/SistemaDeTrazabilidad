@@ -13,6 +13,7 @@ import { MaterialesPage } from './pages/MaterialesPage'
 import { PickingPage } from './pages/PickingPage'
 import { DespachoPage } from './pages/DespachoPage'
 import { DevolucionesPage } from './pages/DevolucionesPage'
+import { AceptarInvitacionPage } from './pages/AceptarInvitacionPage'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -21,6 +22,11 @@ function App() {
   const [stock, setStock] = useState<Producto[]>([])
   const [recetas, setRecetas] = useState<Receta[]>([])
   const [booting, setBooting] = useState(true)
+  // Enlace público de invitación: /aceptar-invitacion?token=…
+  const [inviteToken, setInviteToken] = useState<string | null>(() => {
+    if (!window.location.pathname.includes('aceptar-invitacion')) return null
+    return new URLSearchParams(window.location.search).get('token')
+  })
 
   async function loadData() {
     const [sols, stk, recs] = await Promise.all([
@@ -73,6 +79,18 @@ function App() {
     } catch {
       /* el error ya se mostró en la acción que lo originó */
     }
+  }
+
+  if (inviteToken) {
+    return (
+      <AceptarInvitacionPage
+        token={inviteToken}
+        onDone={() => {
+          window.history.replaceState({}, '', '/')
+          setInviteToken(null)
+        }}
+      />
+    )
   }
 
   if (booting) {

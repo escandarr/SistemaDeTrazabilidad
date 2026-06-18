@@ -1,10 +1,13 @@
 // Capa de acceso a la API del backend (FastAPI).
 import type {
+  BulkInvitacionResult,
   DespachoPendiente,
   DespachoRow,
   DevolucionAbierta,
   DevolucionRow,
   ImportResult,
+  InvitacionCreada,
+  InvitacionInfo,
   MaterialCalculado,
   PickingDetail,
   PickingItem,
@@ -108,18 +111,35 @@ export const api = {
   // --- Gestión de usuarios (solo admin) ---
   listUsuarios: () => request<User[]>('/usuarios'),
 
-  crearUsuario: (payload: { nombre: string; email: string; password: string; rol: Rol }) =>
-    request<User>('/usuarios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }),
-
   actualizarUsuario: (id: string, payload: Partial<{ nombre: string; rol: Rol; activo: boolean; password: string }>) =>
     request<User>(`/usuarios/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+    }),
+
+  // Invitar un usuario: devuelve el token para armar el enlace.
+  invitarUsuario: (payload: { nombre: string; email: string; rol: Rol }) =>
+    request<InvitacionCreada>('/usuarios/invitar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+
+  invitarBulk: (file: File) => {
+    const fd = new FormData()
+    fd.append('archivo', file)
+    return request<BulkInvitacionResult>('/usuarios/invitar/bulk', { method: 'POST', body: fd })
+  },
+
+  // --- Invitaciones (público, sin sesión) ---
+  getInvitacion: (token: string) => request<InvitacionInfo>(`/invitaciones/${token}`),
+
+  aceptarInvitacion: (token: string, password: string) =>
+    request<void>(`/invitaciones/${token}/aceptar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
     }),
 
   // --- Picking (RF03) ---

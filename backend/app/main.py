@@ -9,6 +9,7 @@ from app.api.v1 import (
     catalogo,
     despacho,
     devoluciones,
+    invitaciones,
     picking,
     recetas,
     solicitudes,
@@ -41,6 +42,7 @@ app.add_middleware(
 for router in [
     auth.router,
     usuarios.router,
+    invitaciones.router,
     catalogo.router,
     recetas.router,
     solicitudes.router,
