@@ -268,19 +268,34 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  // Descarga autenticada de los CSV batch para Avesoft (P2 / P3) y exports.
+  // Descarga autenticada de CSV (plantillas, exports, lotes Avesoft P2/P3).
   async descargarCsv(path: string, filename: string): Promise<void> {
     const token = getToken()
     const res = await fetch(`${BASE_URL}${path}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-    if (!res.ok) throw new Error(`No se pudo descargar el archivo (error ${res.status})`)
+    if (!res.ok) {
+      let detail = `Error ${res.status}`
+      try {
+        const body = await res.json()
+        if (body?.detail) detail = typeof body.detail === 'string' ? body.detail : detail
+      } catch {
+        /* sin cuerpo JSON */
+      }
+      throw new Error(`No se pudo descargar (${detail})`)
+    }
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = filename
+    a.style.display = 'none'
+    // Debe estar en el DOM (Firefox) y liberarse después del click (Safari/Chrome).
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(url)
+    setTimeout(() => {
+      URL.revokeObjectURL(url)
+      a.remove()
+    }, 1500)
   },
 }

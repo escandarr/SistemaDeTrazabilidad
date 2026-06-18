@@ -110,6 +110,15 @@ export function UsuariosPage({ currentUserId }: Props) {
     }
   }
 
+  async function descargarPlantilla() {
+    setError('')
+    try {
+      await api.descargarCsv('/usuarios/plantilla', 'plantilla_usuarios.csv')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo descargar la plantilla')
+    }
+  }
+
   async function onBulkFile(file: File) {
     setError('')
     setSaving(true)
@@ -138,7 +147,7 @@ export function UsuariosPage({ currentUserId }: Props) {
             style={{ display: 'none' }}
             onChange={e => e.target.files?.[0] && onBulkFile(e.target.files[0])}
           />
-          <button className="btn btn--secondary btn--sm" onClick={() => api.descargarCsv('/usuarios/plantilla', 'plantilla_usuarios.csv')}>
+          <button className="btn btn--secondary btn--sm" onClick={descargarPlantilla}>
             Plantilla CSV
           </button>
           <button className="btn btn--secondary btn--sm" onClick={() => fileRef.current?.click()} disabled={saving}>
