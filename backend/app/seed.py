@@ -1,24 +1,32 @@
-"""Siembra de datos demo para levantar una demo viva rápidamente.
+"""Siembra de datos demo — preparada para feria / muestra.
 
-Crea las tablas (si no existen) e inserta un conjunto mínimo coherente con el
-documento de diseño: un administrador, los dos proveedores con sus taras,
-productos con sustituto, una receta MMA con su detalle y un centro de costo.
+Datos realistas calcados de los documentos reales de Grupo LC (guía de despacho
+N° 3699, cotización 10563): códigos Avesoft, obra Jumbo La Reina, proveedores con
+tara distinta (Renner 1 kg / importadora y cuarzos 2,5 kg), un material bajo
+mínimo para disparar la alerta y un equivalente entre proveedores para la
+sustitución. Todas las pantallas quedan "vivas" para la demostración.
 
-Uso (dentro del contenedor backend):
-    python -m app.seed
+Uso (dentro del contenedor backend):   python -m app.seed
+Para re-sembrar desde cero:            docker compose down -v && up && python -m app.seed
 """
 import asyncio
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
 
 from app.core.database import AsyncSessionLocal, Base, engine
 from app.core.security import hash_password
 from app.models.catalogo import CentroCosto, Producto, Proveedor, Receta, RecetaDetalle
-from app.models.enums import RolUsuario, SistemaPiso, UnidadMedida
+from app.models.enums import EstadoSolicitud, RolUsuario, SistemaPiso, UnidadMedida
+from app.models.operaciones import Solicitud
 from app.models.usuario import Usuario
 
 ADMIN_EMAIL = "admin@grupolc.cl"
 ADMIN_PASSWORD = "admin1234"
+
+KG = UnidadMedida.KILO
+L = UnidadMedida.LITRO
+UN = UnidadMedida.UNIDAD
 
 
 async def _crear_tablas() -> None:
@@ -37,96 +45,74 @@ async def seed() -> None:
     async with AsyncSessionLocal() as db:
         if await _ya_sembrado(db):
             print("Datos demo ya existen — nada que hacer.")
+            print("Para re-sembrar desde cero: docker compose down -v, luego up y python -m app.seed")
             return
 
-        # Usuario administrador
+        # --- Usuario administrador ---
         admin = Usuario(
-            nombre="Administrador Demo",
+            nombre="Benjamín Escandar",
             email=ADMIN_EMAIL,
             password_hash=hash_password(ADMIN_PASSWORD),
             rol=RolUsuario.ADMINISTRADOR,
         )
 
-        # Proveedores con tara por envase (RF03)
+        # --- Proveedores (tara por envase, RF03) ---
         renner = Proveedor(nombre="Renner", peso_tara_kg=1.0)
-        otro = Proveedor(nombre="Proveedor B", peso_tara_kg=2.5)
+        duracon = Proveedor(nombre="Importadora Duracon", peso_tara_kg=2.5)
+        cuarzos = Proveedor(nombre="Cuarzos del Pacífico", peso_tara_kg=2.5)
 
-        # --- Productos ---
-        # El 304 es sustituto técnico del 526 (RF07)
-        prod_526 = Producto(
-            codigo_avesoft="526",
-            descripcion="Resina MMA base",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=renner,
-            stock_actual=120,
-            stock_minimo=30,
-        )
-        prod_304 = Producto(
-            codigo_avesoft="304",
-            descripcion="Resina MMA base (equivalente)",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=otro,
-            stock_actual=80,
-            stock_minimo=20,
-        )
-        prod_pigmento = Producto(
-            codigo_avesoft="PIG-RED",
-            descripcion="Pigmento rojo",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=renner,
-            stock_actual=40,
-            stock_minimo=10,
-        )
-        prod_epox = Producto(
-            codigo_avesoft="EPOX-A",
-            descripcion="Resina epóxica",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=renner,
-            stock_actual=245,
-            stock_minimo=100,
-        )
-        prod_cat = Producto(
-            codigo_avesoft="CAT-B",
-            descripcion="Catalizador B",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=otro,
-            stock_actual=87,
-            stock_minimo=50,
-        )
-        prod_dilu = Producto(
-            codigo_avesoft="DILU-C",
-            descripcion="Diluyente C",
-            unidad_medida=UnidadMedida.LITRO,
-            proveedor=renner,
-            stock_actual=23,
-            stock_minimo=40,  # bajo mínimo a propósito → alerta de stock
-        )
-        prod_pu = Producto(
-            codigo_avesoft="PU-R",
-            descripcion="Resina poliuretano",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=otro,
-            stock_actual=65,
-            stock_minimo=80,  # bajo mínimo a propósito → alerta de stock
-        )
-        prod_arido = Producto(
-            codigo_avesoft="ARIDO",
-            descripcion="Árido silíceo",
-            unidad_medida=UnidadMedida.KILO,
-            proveedor=otro,
-            stock_actual=540,
-            stock_minimo=200,
-        )
-        prod_526.sustituto = prod_304
+        # --- Productos (códigos Avesoft reales de la guía 3699) ---
+        # Resinas sistema MMA (marca Duracon)
+        resi55 = Producto(codigo_avesoft="RESI55", descripcion="Flowfast Damp Prymer - Duracon 108",
+                          unidad_medida=KG, proveedor=duracon, stock_actual=42, stock_minimo=10)
+        resi56 = Producto(codigo_avesoft="RESI56", descripcion="Flowfast Std Binder - Duracon 205",
+                          unidad_medida=KG, proveedor=duracon, stock_actual=8, stock_minimo=15)   # BAJO MÍNIMO
+        resi56r = Producto(codigo_avesoft="RESI56R", descripcion="Rennerdur 420 (equivalente Duracon 205)",
+                          unidad_medida=KG, proveedor=renner, stock_actual=60, stock_minimo=15)
+        resi62b = Producto(codigo_avesoft="RESI62B", descripcion="Flowfast Catalyst",
+                          unidad_medida=KG, proveedor=duracon, stock_actual=26, stock_minimo=5)
+        resi10 = Producto(codigo_avesoft="RESI10", descripcion="Rennerdur 526",
+                          unidad_medida=KG, proveedor=renner, stock_actual=120, stock_minimo=30)
+        resi57 = Producto(codigo_avesoft="RESI57", descripcion="Flowfast Cove Mix - Duracon 208",
+                          unidad_medida=KG, proveedor=duracon, stock_actual=33, stock_minimo=10)
+        # Cuarzos / áridos
+        cuar24b = Producto(codigo_avesoft="CUAR24B", descripcion="Cuarzo Brazil AFI 202",
+                          unidad_medida=KG, proveedor=cuarzos, stock_actual=500, stock_minimo=100)
+        cuar29 = Producto(codigo_avesoft="CUAR29", descripcion="Cuarzo Natural 14/20",
+                          unidad_medida=KG, proveedor=cuarzos, stock_actual=200, stock_minimo=50)
+        cuar31 = Producto(codigo_avesoft="CUAR31", descripcion="Cuarzo Natural -70",
+                          unidad_medida=KG, proveedor=cuarzos, stock_actual=150, stock_minimo=40)
+        # Solventes / consumibles
+        diso01a = Producto(codigo_avesoft="DISO01A", descripcion="Disolvente CLO",
+                          unidad_medida=L, proveedor=duracon, stock_actual=14, stock_minimo=40)   # BAJO MÍNIMO
+        broc02 = Producto(codigo_avesoft="BROC02", descripcion="Brocha Patagón 3/8x2 1/2\"",
+                          unidad_medida=UN, proveedor=renner, stock_actual=12, stock_minimo=5)
+        eppl01 = Producto(codigo_avesoft="EPPL01", descripcion="Guante PU-Flex Eurogloves",
+                          unidad_medida=UN, proveedor=renner, stock_actual=120, stock_minimo=50)
+        roll03 = Producto(codigo_avesoft="ROLL03", descripcion="Rodillo Patagón Lana 9\" 23 cm",
+                          unidad_medida=UN, proveedor=renner, stock_actual=7, stock_minimo=6)
+        cmas04 = Producto(codigo_avesoft="CMAS04", descripcion="Cinta Masking 36 mm x 40 ml",
+                          unidad_medida=UN, proveedor=renner, stock_actual=8, stock_minimo=10)    # BAJO MÍNIMO
+
+        # Equivalente entre proveedores (RF07 / 3.G4b):
+        # Duracon 205 (bajo stock) ↔ Rennerdur 420.
+        resi56.sustituto = resi56r
+
+        productos = [
+            resi55, resi56, resi56r, resi62b, resi10, resi57,
+            cuar24b, cuar29, cuar31, diso01a, broc02, eppl01, roll03, cmas04,
+        ]
 
         # --- Recetas (sistemas de piso) ---
         receta_mma = Receta(
             nombre_sistema=SistemaPiso.MMA,
-            descripcion="MMA estándar · secado rápido · 3 capas",
+            descripcion="MMA Floorfield · espesor 4/5 mm · 3 capas",
             activa=True,
             detalle=[
-                RecetaDetalle(producto=prod_526, cantidad_por_m2=1.5),
-                RecetaDetalle(producto=prod_pigmento, cantidad_por_m2=0.2),
+                RecetaDetalle(producto=resi55, cantidad_por_m2=0.30),
+                RecetaDetalle(producto=resi56, cantidad_por_m2=1.50),
+                RecetaDetalle(producto=resi62b, cantidad_por_m2=0.10),
+                RecetaDetalle(producto=cuar24b, cantidad_por_m2=3.00),
             ],
         )
         receta_epoxi = Receta(
@@ -134,9 +120,9 @@ async def seed() -> None:
             descripcion="Epóxico industrial · 2 capas · uso general",
             activa=True,
             detalle=[
-                RecetaDetalle(producto=prod_epox, cantidad_por_m2=0.35),
-                RecetaDetalle(producto=prod_cat, cantidad_por_m2=0.15),
-                RecetaDetalle(producto=prod_dilu, cantidad_por_m2=0.05),
+                RecetaDetalle(producto=resi10, cantidad_por_m2=0.35),
+                RecetaDetalle(producto=resi62b, cantidad_por_m2=0.15),
+                RecetaDetalle(producto=diso01a, cantidad_por_m2=0.05),
             ],
         )
         receta_uretano = Receta(
@@ -144,31 +130,53 @@ async def seed() -> None:
             descripcion="Uretano antideslizante · con árido · zonas húmedas",
             activa=True,
             detalle=[
-                RecetaDetalle(producto=prod_pu, cantidad_por_m2=0.45),
-                RecetaDetalle(producto=prod_cat, cantidad_por_m2=0.18),
-                RecetaDetalle(producto=prod_arido, cantidad_por_m2=0.30),
+                RecetaDetalle(producto=resi57, cantidad_por_m2=0.45),
+                RecetaDetalle(producto=resi62b, cantidad_por_m2=0.18),
+                RecetaDetalle(producto=cuar29, cantidad_por_m2=0.30),
             ],
         )
 
-        centro = CentroCosto(
-            codigo="CC-001",
-            nombre_obra="Jumbo La Reina",
-            cliente_identificador="Cencosud",
-        )
+        # --- Centros de costo (obras reales) ---
+        cc_jumbo = CentroCosto(codigo="CC-10563", nombre_obra="Jumbo La Reina - Rincón Jumbo",
+                               cliente_identificador="Cencosud Retail S.A.")
+        cc_maipu = CentroCosto(codigo="CC-10570", nombre_obra="Planta Maipú Norte",
+                               cliente_identificador="Alimentos Maipú SpA")
+        cc_pudahuel = CentroCosto(codigo="CC-10588", nombre_obra="Bodega Pudahuel",
+                                  cliente_identificador="Logística PudahuelLtda.")
 
-        db.add_all(
-            [
-                admin, renner, otro,
-                prod_526, prod_304, prod_pigmento, prod_epox, prod_cat,
-                prod_dilu, prod_pu, prod_arido,
-                receta_mma, receta_epoxi, receta_uretano, centro,
-            ]
-        )
+        db.add_all([admin, renner, duracon, cuarzos, *productos,
+                    receta_mma, receta_epoxi, receta_uretano,
+                    cc_jumbo, cc_maipu, cc_pudahuel])
+        await db.flush()  # genera ids (admin.id, receta.id, etc.)
+
+        ahora = datetime.now(timezone.utc)
+        solicitudes = [
+            # Lista para demostrar picking en vivo (Caso 1).
+            Solicitud(supervisor_id=admin.id, centro_costo_id=cc_jumbo.codigo, m2=12,
+                      sistema_id=receta_mma.id, factor_holgura=10, presupuesto_aprobado=True,
+                      estado=EstadoSolicitud.ENVIADA, creado_at=ahora - timedelta(hours=2)),
+            Solicitud(supervisor_id=admin.id, centro_costo_id=cc_maipu.codigo, m2=150,
+                      sistema_id=receta_epoxi.id, factor_holgura=5, presupuesto_aprobado=True,
+                      estado=EstadoSolicitud.ENVIADA, creado_at=ahora - timedelta(days=1)),
+            Solicitud(supervisor_id=admin.id, centro_costo_id=cc_pudahuel.codigo, m2=80,
+                      sistema_id=receta_uretano.id, factor_holgura=0, presupuesto_aprobado=False,
+                      estado=EstadoSolicitud.BORRADOR, creado_at=ahora - timedelta(days=2)),
+            # Historial cerrado (para que el inicio muestre actividad).
+            Solicitud(supervisor_id=admin.id, centro_costo_id=cc_jumbo.codigo, m2=60,
+                      sistema_id=receta_mma.id, factor_holgura=10, presupuesto_aprobado=True,
+                      estado=EstadoSolicitud.CERRADA, creado_at=ahora - timedelta(days=9)),
+        ]
+        db.add_all(solicitudes)
         await db.commit()
 
-        print("Seed completado.")
-        print(f"  Login admin: {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
-        print(f"  Recetas: MMA={receta_mma.id}, Epoxi={receta_epoxi.id}, Uretano={receta_uretano.id}")
+        print("=" * 60)
+        print("SEED DEMO (feria) completado.")
+        print(f"  Login admin:  {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
+        print(f"  Productos: {len(productos)} | Recetas: 3 | Obras: 3 | Solicitudes: {len(solicitudes)}")
+        print("  Alertas de stock (bajo mínimo): RESI56, DISO01A, CMAS04")
+        print("  Sustitución: RESI56 (Duracon 205) -> RESI56R (Rennerdur 420)")
+        print("  Para Caso 1 (picking en vivo): solicitud ENVIADA de 'Jumbo La Reina', MMA 12 m²")
+        print("=" * 60)
 
 
 if __name__ == "__main__":
