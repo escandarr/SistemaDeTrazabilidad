@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -26,6 +27,15 @@ async def lifespan(_: FastAPI):
     # esquema en producción se migrará a Alembic.
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    # Auto-siembra SOLO si la base está vacía (el propio seed verifica). Asegura
+    # que un despliegue nuevo tenga datos de demo y un usuario admin para entrar,
+    # sin tener que correr el seed a mano. Nunca debe impedir el arranque.
+    try:
+        from app.seed import seed
+
+        await seed()
+    except Exception as exc:  # noqa: BLE001
+        logging.getLogger("startup").warning("Auto-seed omitido por error: %s", exc)
     yield
 
 
