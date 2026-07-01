@@ -131,6 +131,9 @@
   padding: 0 32px; position: sticky; top: 0; z-index: 50;
 }
 .topbar__title { font-size: 17px; font-weight: 700; color: var(--tinta); letter-spacing: -0.01em; }
+.topbar__right { display: flex; align-items: center; gap: 16px; }
+.topbar__help { white-space: nowrap; }
+@media (max-width: 560px) { .topbar__help span { display: none; } }
 .topbar__user { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.25; }
 .topbar__user-name { font-size: 13px; font-weight: 600; color: var(--tinta); }
 .topbar__user-email { font-size: 12px; color: var(--gris-600); }

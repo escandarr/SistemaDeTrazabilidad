@@ -17,6 +17,22 @@ import { AceptarInvitacionPage } from './pages/AceptarInvitacionPage'
 import { TutorialesPage } from './pages/TutorialesPage'
 import { Tour } from './components/Tour'
 import type { TourStep } from './tours'
+import { BIENVENIDA, TODOS } from './tours'
+
+// Tutorial más relevante para el botón "Ver tutorial" de cada página.
+const PAGE_TUTORIAL: Partial<Record<Page, string>> = {
+  dashboard: 'bienvenida',
+  solicitudes: 'caso1',
+  'nueva-solicitud': 'caso1',
+  stock: 'caso2',
+  picking: 'caso1',
+  despacho: 'caso1',
+  devoluciones: 'caso1',
+  materiales: 'caso4',
+  usuarios: 'caso3',
+}
+
+const WELCOME_KEY = 'grupolc_welcome_seen'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -66,6 +82,19 @@ function App() {
     const me = await api.me()
     setUser(me)
     await loadData()
+  }
+
+  // Tour de bienvenida automático la primera vez (por navegador).
+  useEffect(() => {
+    if (user && !localStorage.getItem(WELCOME_KEY)) {
+      localStorage.setItem(WELCOME_KEY, '1')
+      setTourSteps(BIENVENIDA.steps)
+    }
+  }, [user])
+
+  function startTutorial(id: string) {
+    const t = TODOS.find(x => x.id === id)
+    if (t) setTourSteps(t.steps)
   }
 
   function logout() {
@@ -145,9 +174,17 @@ function App() {
       break
   }
 
+  const tutorialId = PAGE_TUTORIAL[page]
+
   return (
     <>
-      <Layout user={user} page={page} navigate={navigate} logout={logout}>
+      <Layout
+        user={user}
+        page={page}
+        navigate={navigate}
+        logout={logout}
+        onTutorial={tutorialId ? () => startTutorial(tutorialId) : undefined}
+      >
         {content}
       </Layout>
       {tourSteps && (

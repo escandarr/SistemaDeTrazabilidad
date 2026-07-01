@@ -17,6 +17,44 @@ export interface Tutorial {
   steps: TourStep[]
 }
 
+export const BIENVENIDA: Tutorial = {
+  id: 'bienvenida',
+  numero: 'Bienvenida',
+  titulo: 'Recorrido general',
+  resumen: 'Un vistazo rápido a todo el sistema en menos de un minuto. Ideal para empezar.',
+  steps: [
+    {
+      title: '¡Bienvenido a Grupo LC · Trazabilidad!',
+      body: 'En menos de un minuto te muestro todo lo que puedes hacer aquí. Puedes cerrar en cualquier momento con la ✕.',
+    },
+    {
+      page: 'dashboard', anchor: 'dash-metrics',
+      title: 'El Inicio',
+      body: 'Tu tablero del día: solicitudes, pendientes, alertas de stock y productos en inventario.',
+    },
+    {
+      anchor: 'nav-solicitudes',
+      title: 'Solicitudes',
+      body: 'Creas y sigues los pedidos de material. El sistema calcula solo cuánto se necesita por m² (cubicación).',
+    },
+    {
+      anchor: 'nav-picking',
+      title: 'Bodega',
+      body: 'Preparas el pedido pesando (Picking), lo despachas con guía para Avesoft y registras las devoluciones.',
+    },
+    {
+      anchor: 'nav-materiales',
+      title: 'Administración',
+      body: 'Gestionas el catálogo de materiales, los proveedores, las recetas y los usuarios con sus roles.',
+    },
+    {
+      anchor: 'nav-tutoriales',
+      title: 'Tutoriales',
+      body: 'Aquí puedes repetir el recorrido de cada caso paso a paso cuando quieras. ¡Explora con confianza!',
+    },
+  ],
+}
+
 export const TUTORIALES: Tutorial[] = [
   {
     id: 'caso1',
@@ -127,3 +165,6 @@ export const TUTORIALES: Tutorial[] = [
     ],
   },
 ]
+
+// Lista completa para la página de Tutoriales y para buscar por id.
+export const TODOS: Tutorial[] = [BIENVENIDA, ...TUTORIALES]

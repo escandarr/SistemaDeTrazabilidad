@@ -1,4 +1,4 @@
-import { TUTORIALES } from '../tours'
+import { TODOS } from '../tours'
 import type { Tutorial } from '../tours'
 
 interface Props {
@@ -18,7 +18,7 @@ export function TutorialesPage({ onStart }: Props) {
       </div>
 
       <div className="tut-grid">
-        {TUTORIALES.map(t => (
+        {TODOS.map(t => (
           <div key={t.id} className="tut-card">
             <span className="tut-card__n">{t.numero}</span>
             <div className="tut-card__t">{t.titulo}</div>
