@@ -2,6 +2,7 @@ import type { ComponentType, SVGProps } from 'react'
 import type { Page, Rol, User } from '../types'
 import { ROL_LABELS } from '../types'
 import {
+  BookIcon,
   ClipboardIcon,
   FilePlusIcon,
   HomeIcon,
@@ -54,6 +55,12 @@ const GROUPS: NavGroup[] = [
       { id: 'usuarios', label: 'Usuarios', roles: ['administrador'], Icon: UsersIcon },
     ],
   },
+  {
+    label: 'Ayuda',
+    items: [
+      { id: 'tutoriales', label: 'Tutoriales', roles: ['administrador', 'supervisor', 'operario_bodega', 'jefe_bodega'], Icon: BookIcon },
+    ],
+  },
 ]
 
 interface Props {
@@ -85,6 +92,7 @@ export function Sidebar({ user, page, navigate, logout }: Props) {
             {g.items.map(({ id, label, Icon }) => (
               <button
                 key={id}
+                data-tour={`nav-${id}`}
                 className={`nav-item ${page === id ? 'nav-item--active' : ''}`}
                 onClick={() => navigate(id)}
                 aria-current={page === id ? 'page' : undefined}

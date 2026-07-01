@@ -102,7 +102,7 @@ export function NuevaSolicitudPage({ recetas, stock, onCreated, navigate }: Prop
   }
 
   return (
-    <div className="form-panel">
+    <div className="form-panel" data-tour="ns-panel">
       <div className="stepper">
         {STEPS.map((s, i) => (
           <div key={s} className={`step ${i < step ? 'step--done' : ''} ${i === step ? 'step--active' : ''}`}>

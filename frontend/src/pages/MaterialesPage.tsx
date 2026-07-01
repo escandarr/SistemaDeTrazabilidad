@@ -206,7 +206,7 @@ export function MaterialesPage() {
         <>
           <div className="content-head">
             <h2 className="section-title" style={{ marginBottom: 0 }}>Catálogo de productos</h2>
-            <div className="toolbar">
+            <div className="toolbar" data-tour="mat-toolbar">
               <input
                 ref={fileRef}
                 type="file"

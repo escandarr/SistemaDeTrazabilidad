@@ -12,6 +12,7 @@ const TITLES: Record<Page, string> = {
   picking: 'Picking',
   despacho: 'Despacho',
   devoluciones: 'Devoluciones',
+  tutoriales: 'Tutoriales',
 }
 
 interface Props {

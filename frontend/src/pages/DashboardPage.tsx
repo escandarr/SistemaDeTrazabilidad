@@ -36,7 +36,7 @@ export function DashboardPage({ user, solicitudes, stock, navigate }: Props) {
         </div>
       )}
 
-      <div className="metrics">
+      <div className="metrics" data-tour="dash-metrics">
         {metrics.map(m => (
           <button key={m.label} className="metric" onClick={() => navigate(m.page)}>
             <div className={`metric__value ${m.danger ? 'metric__value--danger' : ''}`}>{m.value}</div>

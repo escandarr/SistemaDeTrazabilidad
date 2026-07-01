@@ -14,6 +14,7 @@ export type Page =
   | 'picking'
   | 'despacho'
   | 'devoluciones'
+  | 'tutoriales'
 
 export type UnidadMedida = 'kg' | 'l' | 'un'
 

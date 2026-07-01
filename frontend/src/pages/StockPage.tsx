@@ -43,7 +43,7 @@ export function StockPage({ stock }: Props) {
       {exportError && <div className="alert alert--warning">{exportError}</div>}
 
       <div className="content-head">
-        <h2 className="section-title" style={{ marginBottom: 0 }}>Stock actual</h2>
+        <h2 className="section-title" style={{ marginBottom: 0 }} data-tour="stock-content">Stock actual</h2>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {criticals.length > 0 && <span className="badge badge--critical">{criticals.length} críticos</span>}
           {lows.length > 0 && <span className="badge badge--low">{lows.length} bajo</span>}

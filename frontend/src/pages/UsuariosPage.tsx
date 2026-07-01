@@ -139,7 +139,7 @@ export function UsuariosPage({ currentUserId }: Props) {
     <>
       <div className="content-head">
         <h2 className="section-title" style={{ marginBottom: 0 }}>Usuarios del sistema</h2>
-        <div className="toolbar">
+        <div className="toolbar" data-tour="user-toolbar">
           <input
             ref={fileRef}
             type="file"

@@ -14,6 +14,9 @@ import { PickingPage } from './pages/PickingPage'
 import { DespachoPage } from './pages/DespachoPage'
 import { DevolucionesPage } from './pages/DevolucionesPage'
 import { AceptarInvitacionPage } from './pages/AceptarInvitacionPage'
+import { TutorialesPage } from './pages/TutorialesPage'
+import { Tour } from './components/Tour'
+import type { TourStep } from './tours'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -22,6 +25,7 @@ function App() {
   const [stock, setStock] = useState<Producto[]>([])
   const [recetas, setRecetas] = useState<Receta[]>([])
   const [booting, setBooting] = useState(true)
+  const [tourSteps, setTourSteps] = useState<TourStep[] | null>(null)
   // Enlace público de invitación: /aceptar-invitacion?token=…
   const [inviteToken, setInviteToken] = useState<string | null>(() => {
     if (!window.location.pathname.includes('aceptar-invitacion')) return null
@@ -136,12 +140,20 @@ function App() {
     case 'devoluciones':
       content = <DevolucionesPage onChanged={refresh} />
       break
+    case 'tutoriales':
+      content = <TutorialesPage onStart={t => setTourSteps(t.steps)} />
+      break
   }
 
   return (
-    <Layout user={user} page={page} navigate={navigate} logout={logout}>
-      {content}
-    </Layout>
+    <>
+      <Layout user={user} page={page} navigate={navigate} logout={logout}>
+        {content}
+      </Layout>
+      {tourSteps && (
+        <Tour steps={tourSteps} navigate={navigate} onClose={() => setTourSteps(null)} />
+      )}
+    </>
   )
 }
 

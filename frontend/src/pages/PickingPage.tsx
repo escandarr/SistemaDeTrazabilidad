@@ -200,7 +200,7 @@ export function PickingPage({ user, onChanged }: Props) {
   return (
     <>
       <div className="content-head">
-        <h2 className="section-title" style={{ marginBottom: 0 }}>Solicitudes por preparar</h2>
+        <h2 className="section-title" style={{ marginBottom: 0 }} data-tour="picking-content">Solicitudes por preparar</h2>
       </div>
 
       {error && <div className="alert alert--warning">{error}</div>}

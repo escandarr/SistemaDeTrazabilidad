@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grupo LC — Trazabilidad · Presentación feria</title>
+<style>
+  :root{
+    --carbon-950:#16191d; --carbon-800:#23272d; --carbon-700:#3a4048;
+    --tinta:#1b1e22; --gris:#5c646d; --gris-400:#9aa1a9;
+    --losa-200:#dcdfe2; --losa-100:#eceef0; --blanco:#fff;
+    --ambar:#f5a800; --ambar-600:#c98a00; --ambar-100:#fdf3d7; --ambar-text:#7c5200;
+    --ok:#2e7d4f; --ok-100:#e2f2e8; --rojo:#c03a2e; --rojo-100:#fbe7e4;
+    --mono: ui-monospace,'IBM Plex Mono','Cascadia Mono','Consolas',monospace;
+    --ui: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    --demarcacion: repeating-linear-gradient(-45deg, var(--ambar) 0 14px, var(--carbon-950) 14px 28px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0e1013;font-family:var(--ui);color:var(--tinta)}
+
+  .slide{
+    display:none; width:100vw; height:100vh; padding:7vh 8vw; position:relative;
+    flex-direction:column; justify-content:center; background:var(--losa-100); overflow:hidden;
+  }
+  .slide.active{display:flex}
+  .slide::before{content:'';position:absolute;top:0;left:0;right:0;height:8px;background:var(--demarcacion)}
+
+  /* Slides oscuros (portada / cierre) */
+  .slide--dark{background:var(--carbon-950);color:var(--blanco)}
+  .slide--dark .eyebrow{color:var(--ambar)}
+  .slide--dark h1{color:#fff}
+
+  .eyebrow{font-size:clamp(13px,1.4vw,18px);font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ambar-600);margin-bottom:18px}
+  h1{font-size:clamp(34px,6vw,76px);line-height:1.04;letter-spacing:-.02em;font-weight:800}
+  h2{font-size:clamp(28px,4.4vw,54px);line-height:1.07;letter-spacing:-.02em;font-weight:800;color:var(--tinta);margin-bottom:6px}
+  .sub{font-size:clamp(16px,2vw,26px);color:var(--gris);margin-top:18px;max-width:60ch}
+  .slide--dark .sub{color:var(--gris-400)}
+
+  .brand{display:flex;align-items:center;gap:16px;margin-bottom:34px}
+  .brand .mark{width:64px;height:64px;border-radius:12px;background:var(--ambar);color:var(--carbon-950);
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;letter-spacing:.04em}
+  .brand .name{font-weight:800;font-size:clamp(16px,1.8vw,22px);line-height:1.1}
+  .brand .name span{display:block;font-weight:500;color:var(--gris-400);font-size:.8em}
+
+  ul.pains{list-style:none;margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:14px 40px;max-width:1100px}
+  ul.pains li{font-size:clamp(16px,1.9vw,23px);padding-left:34px;position:relative;line-height:1.3}
+  ul.pains li::before{content:'✕';position:absolute;left:0;top:0;color:var(--rojo);font-weight:800}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:34px}
+  .flow .step{background:var(--carbon-950);color:#fff;border-radius:10px;padding:14px 18px;font-weight:700;font-size:clamp(14px,1.6vw,20px)}
+  .flow .step b{color:var(--ambar);display:block;font-size:.72em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+  .flow .arrow{color:var(--ambar-600);font-size:clamp(18px,2vw,26px);font-weight:800}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .chip{background:var(--ambar-100);color:var(--ambar-text);border-radius:999px;padding:8px 16px;font-weight:700;font-size:clamp(13px,1.5vw,18px)}
+
+  .case-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;margin-top:24px;align-items:start}
+  .problema{background:var(--rojo-100);border-left:4px solid var(--rojo);border-radius:8px;padding:16px 18px;font-size:clamp(15px,1.7vw,21px);color:#7a241c;margin-top:18px}
+  .problema b{color:var(--rojo)}
+  ol.steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  ol.steps li{counter-increment:s;position:relative;padding-left:46px;font-size:clamp(15px,1.7vw,21px);line-height:1.3}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:8px;
+    background:var(--carbon-950);color:var(--ambar);display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--mono);font-size:15px}
+  .wow{background:var(--carbon-950);color:#fff;border-radius:12px;padding:22px 24px;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+  .wow .lbl{color:var(--ambar);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:clamp(12px,1.3vw,15px);margin-bottom:10px}
+  .wow p{font-size:clamp(17px,2vw,26px);line-height:1.25;font-weight:600}
+  .mono{font-family:var(--mono)}
+
+  table.cmp{width:100%;border-collapse:collapse;margin-top:26px;font-size:clamp(14px,1.7vw,21px)}
+  table.cmp th,table.cmp td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--losa-200);vertical-align:top}
+  table.cmp thead th{font-size:.8em;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);border-bottom:2px solid var(--carbon-950)}
+  table.cmp td.antes{color:#7a241c}
+  table.cmp td.ahora{color:var(--ok);font-weight:600}
+  table.cmp td:first-child{font-weight:700;color:var(--tinta)}
+
+  .stack{display:flex;flex-wrap:wrap;gap:14px;margin-top:24px}
+  .stack .box{flex:1;min-width:220px;background:var(--blanco);border:1px solid var(--losa-200);border-radius:12px;padding:20px}
+  .stack .box h3{font-size:clamp(16px,1.8vw,22px);margin-bottom:6px}
+  .stack .box p{color:var(--gris);font-size:clamp(13px,1.5vw,18px);line-height:1.35}
+  .formula{margin-top:26px;display:flex;flex-wrap:wrap;gap:14px}
+  .formula code{font-family:var(--mono);background:var(--carbon-950);color:var(--ambar);padding:12px 16px;border-radius:8px;font-size:clamp(13px,1.5vw,19px)}
+
+  .big-close{font-size:clamp(36px,6.5vw,84px);line-height:1.03;font-weight:800;letter-spacing:-.02em;max-width:18ch}
+  .demo-line{margin-top:34px;font-size:clamp(16px,2vw,24px);color:var(--gris-400)}
+  .demo-line b{color:#fff}
+  .demo-line .mono{color:var(--ambar)}
+
+  /* Chrome de navegación (no se imprime) */
+  .chrome{position:fixed;bottom:16px;right:20px;display:flex;align-items:center;gap:14px;z-index:50;font-family:var(--mono);color:var(--gris-400);font-size:13px}
+  .chrome button{background:var(--carbon-800);color:#fff;border:none;border-radius:8px;width:38px;height:38px;font-size:18px;cursor:pointer}
+  .chrome button:hover{background:var(--ambar);color:var(--carbon-950)}
+  .hint{position:fixed;bottom:18px;left:20px;z-index:50;font-family:var(--mono);font-size:12px;color:var(--gris-400)}
+
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    html,body{height:auto;background:#fff}
+    .slide{display:flex !important;height:720px;width:1280px;page-break-after:always;break-after:page}
+    .chrome,.hint{display:none !important}
+  }
+</style>
+</head>
+<body>
+
+<!-- 1 · PORTADA -->
+<section class="slide slide--dark active">
+  <div class="brand">
+    <div class="mark">LC</div>
+    <div class="name">Grupo LC<span>Soluciones Constructivas</span></div>
+  </div>
+  <h1>Sistema de Trazabilidad<br>de Materiales</h1>
+  <p class="sub">De la bodega a la obra, sin papel y en tiempo real. Gestión de inventario, pesaje, despacho y consumo para pisos industriales.</p>
+  <p class="demo-line">Demostración en vivo · Feria 2026</p>
+</section>
+
+<!-- 2 · EL PROBLEMA -->
+<section class="slide">
+  <div class="eyebrow">El problema</div>
+  <h2>Hoy todo se gestiona en papel</h2>
+  <ul class="pains">
+    <li>Los materiales se calculan a mano: errores y sobrepedido</li>
+    <li>El pesaje y la tara se restan en una hoja</li>
+    <li>Cada guía se vuelve a tipear en Avesoft</li>
+    <li>Nadie sabe el consumo real por obra</li>
+    <li>Los quiebres de stock llegan sin aviso</li>
+    <li>Las sustituciones entre proveedores se hacen a ojo</li>
+    <li>No hay control de quién hace cada operación</li>
+    <li>Cero trazabilidad: si algo falla, no hay registro</li>
+  </ul>
+</section>
+
+<!-- 3 · LA SOLUCIÓN -->
+<section class="slide">
+  <div class="eyebrow">La solución</div>
+  <h2>Una app que digitaliza el ciclo completo</h2>
+  <p class="sub">Cada material queda registrado y pesado, el stock se actualiza solo y el consumo real se calcula al cerrar la obra.</p>
+  <div class="flow">
+    <div class="step"><b>1 Terreno</b>Solicitud</div><span class="arrow">→</span>
+    <div class="step"><b>2 Bodega</b>Picking + pesaje</div><span class="arrow">→</span>
+    <div class="step"><b>3 Salida</b>Despacho · Avesoft</div><span class="arrow">→</span>
+    <div class="step"><b>4 Retorno</b>Devolución</div><span class="arrow">→</span>
+    <div class="step"><b>5 Cierre</b>Consumo real</div>
+  </div>
+  <div class="chips">
+    <span class="chip">Alertas de stock</span>
+    <span class="chip">Sustitución entre proveedores</span>
+    <span class="chip">Usuarios y roles</span>
+    <span class="chip">PWA: funciona en la bodega</span>
+  </div>
+</section>
+
+<!-- 4 · CASO 1 -->
+<section class="slide">
+  <div class="eyebrow">Caso 1 · Demostración principal</div>
+  <h2>Del pedido al consumo real</h2>
+  <div class="problema"><b>Antes:</b> el papel pierde la trazabilidad y nunca cierra cuánto se gastó de verdad en la obra.</div>
+  <div class="case-grid">
+    <ol class="steps">
+      <li>Nueva solicitud: obra <b>Jumbo La Reina</b>, sistema <b>MMA</b>, <span class="mono">12 m²</span> +10%.</li>
+      <li>El sistema calcula la <b>cubicación automática</b> (kg por material).</li>
+      <li>Picking: pesa por bulto; resta la <b>tara del proveedor</b> y muestra bruto / tara / neto.</li>
+      <li>Despacho: <b>descuenta el stock</b> y genera el <b>CSV para Avesoft</b>.</li>
+      <li>Devolución: pesa lo que volvió y reingresa al inventario.</li>
+      <li>Cierre con el <b>consumo real</b> de la obra.</li>
+    </ol>
+    <div class="wow">
+      <div class="lbl">El momento clave</div>
+      <p>Consumo real = <span class="mono">Despachado − Devuelto</span>, con la trazabilidad completa: solicitud → picking → despacho → devolución.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · CASO 2 -->
+<section class="slide">
+  <div class="eyebrow">Caso 2</div>
+  <h2>Quiebre de stock y equivalente</h2>
+  <div class="problema"><b>Antes:</b> se acaba un material y hay que llamar al proveedor o adivinar el reemplazo.</div>
+  <div class="case-grid">
+    <ol class="steps">
+      <li>Inventario muestra <b class="mono">RESI56</b> en rojo: bajo el mínimo.</li>
+      <li>La alerta también aparece en el Inicio.</li>
+      <li>En el picking, cuando el stock no alcanza, el sistema ofrece el <b>equivalente de otro proveedor</b> (<span class="mono">RESI56R</span>) con su stock.</li>
+      <li>Un botón <b>“Usar equivalente”</b> hace el cambio.</li>
+    </ol>
+    <div class="wow">
+      <div class="lbl">El momento clave</div>
+      <p>La alerta salta sola y el reemplazo ya está sugerido. Cero improvisación, cero obra detenida.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · CASO 3 -->
+<section class="slide">
+  <div class="eyebrow">Caso 3</div>
+  <h2>Alta del equipo, y segura</h2>
+  <div class="problema"><b>Antes:</b> sin control de acceso; cualquiera podía hacer cualquier operación.</div>
+  <div class="case-grid">
+    <ol class="steps">
+      <li>Usuarios → Nuevo: se genera un <b>enlace de invitación</b>.</li>
+      <li>El usuario abre el link y <b>crea su propia contraseña</b>, con medidor de seguridad en vivo.</li>
+      <li><b>Carga masiva por CSV</b> para dar de alta a todo el equipo de una vez.</li>
+      <li>Cada rol ve solo lo que le corresponde.</li>
+    </ol>
+    <div class="wow">
+      <div class="lbl">El momento clave</div>
+      <p>Invitación por enlace + contraseñas de alta entropía + permisos por rol. Onboarding en segundos y con control.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · CASO 4 -->
+<section class="slide">
+  <div class="eyebrow">Caso 4 · Para el jurado técnico</div>
+  <h2>Integración con Avesoft, sin API</h2>
+  <div class="problema"><b>El reto:</b> Avesoft no expone API; todo se tipeaba a mano, dos veces.</div>
+  <div class="case-grid">
+    <ol class="steps">
+      <li>Materiales → <b>Importar</b> el maestro de productos por CSV.</li>
+      <li><b>Exportar</b> el catálogo y el inventario cuando se necesite.</li>
+      <li>El despacho genera el <b>CSV de salidas</b> por centro de costo.</li>
+      <li>La devolución genera el <b>CSV de reingreso</b>.</li>
+    </ol>
+    <div class="wow">
+      <div class="lbl">El momento clave</div>
+      <p>Conectamos ambos mundos por archivo, que es como Avesoft trabaja de verdad. Sin doble digitación.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · ANTES VS AHORA -->
+<section class="slide">
+  <div class="eyebrow">El impacto</div>
+  <h2>Antes vs. Ahora</h2>
+  <table class="cmp">
+    <thead><tr><th>Tarea</th><th>Antes (papel)</th><th>Ahora (sistema)</th></tr></thead>
+    <tbody>
+      <tr><td>Cálculo de materiales</td><td class="antes">Calculadora y planilla</td><td class="ahora">Cubicación automática por m²</td></tr>
+      <tr><td>Pesaje y tara</td><td class="antes">Resta manual en una hoja</td><td class="ahora">Bruto − tara del proveedor, automático</td></tr>
+      <tr><td>Guía a Avesoft</td><td class="antes">Se re-tipea a mano</td><td class="ahora">CSV listo para importar</td></tr>
+      <tr><td>Consumo por obra</td><td class="antes">No se conoce</td><td class="ahora">Despachado − devuelto, exacto</td></tr>
+      <tr><td>Stock</td><td class="antes">Quiebres sorpresa</td><td class="ahora">Alertas bajo mínimo</td></tr>
+      <tr><td>Sustitución</td><td class="antes">A ojo</td><td class="ahora">Equivalente sugerido</td></tr>
+      <tr><td>Acceso</td><td class="antes">Sin control</td><td class="ahora">Usuarios, roles y trazabilidad</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 9 · STACK -->
+<section class="slide">
+  <div class="eyebrow">Cómo está construido</div>
+  <h2>Arquitectura</h2>
+  <div class="stack">
+    <div class="box"><h3>Frontend · PWA</h3><p>React + TypeScript. Instalable, funciona en la bodega desde el celular.</p></div>
+    <div class="box"><h3>Backend · API</h3><p>FastAPI (Python) con control de acceso por rol y la lógica de pesaje y consumo.</p></div>
+    <div class="box"><h3>Datos</h3><p>PostgreSQL. Cada operación queda registrada y trazable.</p></div>
+  </div>
+  <div class="formula">
+    <code>M_neto = M_bruto − Tara</code>
+    <code>Consumo = Σ Despachado − Σ Devuelto</code>
+    <code>Avesoft CSV: P1 catálogo · P2 despacho · P3 devolución</code>
+  </div>
+</section>
+
+<!-- 10 · CIERRE -->
+<section class="slide slide--dark">
+  <div class="eyebrow">Grupo LC · Trazabilidad</div>
+  <p class="big-close">Del papel a la trazabilidad en tiempo real.</p>
+  <p class="demo-line">Demo en vivo: <b class="mono">sistema-de-trazabilidad.vercel.app</b></p>
+  <p class="demo-line" style="margin-top:10px">Gracias.</p>
+</section>
+
+<div class="hint">← → para navegar · F11 pantalla completa · Ctrl/⌘+P → Guardar como PDF</div>
+<div class="chrome">
+  <button onclick="nav(-1)" aria-label="Anterior">‹</button>
+  <span class="counter">1 / 10</span>
+  <button onclick="nav(1)" aria-label="Siguiente">›</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    document.querySelector('.counter').textContent=(i+1)+' / '+slides.length;
+  }
+  function nav(d){show(i+d)}
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();nav(1)}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();nav(-1)}
+    else if(e.key==='Home')show(0);
+    else if(e.key==='End')show(slides.length-1);
+  });
+  show(0);
+</script>
+</body>
+</html>
